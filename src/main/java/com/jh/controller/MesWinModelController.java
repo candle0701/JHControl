@@ -359,10 +359,14 @@ public class MesWinModelController {
             MesWinModelCraft mesWinModelCraft = new MesWinModelCraft();
             MesWinModel mesWinModel = new MesWinModel();
             for (int i = 1; i < rowLength; i++) {
-                j=i;
                 Row row = sheet.getRow(i);
                 row.getCell(0).setCellType(CellType.STRING);
                 String tier = row.getCell(0).getStringCellValue();//层次
+                if(tier.trim().length() == 0){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("msg", "导入成功");
+                    return jsonObject;
+                }
                 row.getCell(1).setCellType(CellType.STRING);
                 String name = row.getCell(1).getStringCellValue();//名称
                 row.getCell(2).setCellType(CellType.STRING);
@@ -391,7 +395,7 @@ public class MesWinModelController {
                         mesWinModelCraftService.del(winModelList.get(0).getWinId());
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("code", 0);
-                        jsonObject.put("msg", "导入失败,第" + i + "行,此窗型已存在工序.");
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,此窗型已存在工序.");
                         return jsonObject;
                     }
                 }
@@ -402,21 +406,23 @@ public class MesWinModelController {
                     jsonObject.put("msg", "导入失败,窗型"+winCode+"不存在,请添加窗型"+winCode+"后再导入");
                     return jsonObject;
                 }
-                if(code.length()>6 && Integer.valueOf(code)> 100 && i>1 ){
-                    MesProcessQuota   processQuota=new    MesProcessQuota();
-                    processQuota.setId(code);
-                    MesProcessQuota mesProcessQuota= mesProcessQuotaservice.find(processQuota);
-                    if(mesProcessQuota == null){
-                        MesWinModel mesWinModel1=new MesWinModel();
-                        mesWinModel1.setCode(winCode);
-                        List<MesWinModel> winModelList = mesWinModelService.findAll(mesWinModel1);
-                        mesWinModelCraftService.del(winModelList.get(0).getWinId());
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("code", 0);
-                        jsonObject.put("msg", "导入失败,第" + i + "行,此工序不存在.");
-                        return jsonObject;
-                    }
+                if(Integer.valueOf(tier)==3){
+                        MesProcessQuota   processQuota=new    MesProcessQuota();
+                        processQuota.setId(code);
+                        MesProcessQuota mesProcessQuota= mesProcessQuotaservice.find(processQuota);
+                        if(mesProcessQuota == null){
+                            MesWinModel mesWinModel1=new MesWinModel();
+                            mesWinModel1.setCode(winCode);
+                            List<MesWinModel> winModelList = mesWinModelService.findAll(mesWinModel1);
+                            mesWinModelCraftService.del(winModelList.get(0).getWinId());
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("code", 0);
+                            jsonObject.put("msg", "导入失败,第" + ++i + "行,此工序不存在.");
+                            return jsonObject;
+                        }
                 }
+
+
 
                 if (i == 1) {
                     mesWinModel.setCode(winCode);
@@ -428,13 +434,13 @@ public class MesWinModelController {
                         if (li.size() > 1) {
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("code", 0);
-                            jsonObject.put("msg", "导入失败,第" + i + "行,此窗型已存在工序.");
+                            jsonObject.put("msg", "导入失败,第" + ++i + "行,此窗型已存在工序.");
                             return jsonObject;
                         }
                     } else {
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("code", 0);
-                        jsonObject.put("msg", "导入失败,第" + i + "行,此窗型不存在.");
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,此窗型不存在.");
                         return jsonObject;
                     }
                 }
@@ -447,7 +453,7 @@ public class MesWinModelController {
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("code", 0);
                         i++;
-                        jsonObject.put("msg", "导入失败,第" + i + "行,窗型编号不正确");
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,窗型编号不正确");
                         return jsonObject;
                     }
                 }
@@ -491,10 +497,24 @@ public class MesWinModelController {
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("code", 0);
                         i++;
-                        jsonObject.put("msg", "导入失败,第" + i + "行,窗型编号不正确");
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,窗型编号不正确");
                         return jsonObject;
                     }
                 } else if (tier.equals("3")) {
+                    /**
+                     * 查询窗型
+                     */
+                    mesWinModel.setCode(winCode);
+                    List<MesWinModel> winModelList = mesWinModelService.findAll(mesWinModel);
+
+                    if(group.length()<2){
+                        mesWinModelCraftService.del(winModelList.get(0).getWinId());
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("code", 0);
+                        i++;
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,组别不正确:例如 下料 01  加工 02等");
+                        return jsonObject;
+                    }
                     /**
                      * 根据字典表 查询字典表
                      */
@@ -502,12 +522,15 @@ public class MesWinModelController {
                     mesDictionaries.setType("WIN_PROCESS3");
                     mesDictionaries.setValue(group);
                     List<MesDictionaries> mesDictionariesList = mesDictionariesService.findList(mesDictionaries);
+                    if(mesDictionariesList.size()==0){
+                        mesWinModelCraftService.del(winModelList.get(0).getWinId());
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("code", 0);
+                        i++;
+                        jsonObject.put("msg", "导入失败,第" + ++i + "行,组别不存在");
+                        return jsonObject;
+                    }
 
-                    /**
-                     * 查询窗型
-                     */
-                    mesWinModel.setCode(winCode);
-                    List<MesWinModel> winModelList = mesWinModelService.findAll(mesWinModel);
 
 
                     MesDictionaries dic = new MesDictionaries();
@@ -602,7 +625,7 @@ public class MesWinModelController {
         } catch (Exception e) {
             if(j>3){
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("msg", "导入失败,第" + j + "行数据格式错误,请检查数据模板是否按照数据格式准备的数据。");
+                jsonObject.put("msg", "导入失败,第" + ++j + "行数据格式错误,请检查数据模板是否按照数据格式准备的数据。");
                 return jsonObject;
             }else{
                 MesWinModel mesWinModel=new MesWinModel();
@@ -611,7 +634,7 @@ public class MesWinModelController {
                 mesWinModelCraftService.del(winModelList.get(0).getWinId());
 
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("msg", "导入失败,第" + j + "行数据格式错误,请检查数据模板是否按照数据格式准备的数据。");
+                jsonObject.put("msg", "导入失败,第" + ++j + "行数据格式错误,请检查数据模板是否按照数据格式准备的数据。");
                 return jsonObject;
             }
         }

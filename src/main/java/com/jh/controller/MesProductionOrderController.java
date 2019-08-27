@@ -275,7 +275,7 @@ public class MesProductionOrderController {
     @ResponseBody
     @RequestMapping("list")
     public JSONObject list(Model model, String  taskName,int page, int limit) {
-        if(taskName != null ){
+        if( StringUtils.isNotEmpty(taskName) ){
             PageHelper.startPage(page,limit);
             List<Map<String,String>> list=mesTaskDetailService.findMap(taskName.trim());
             PageInfo<Map<String,String>> pageInfo = new PageInfo<>(list);

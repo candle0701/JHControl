@@ -35,6 +35,12 @@
             background: url(/images/bg.png) no-repeat center;
             background-size: cover
         }
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color:transparent;
+        }
+        .layui-text em{
+            color:#999;
+        }
     </style>
 </head>
 <body>
@@ -43,6 +49,7 @@
 <div class="layui-card-body ">
     <div class="layui-input-inline layui-show-xs-block">
         <select name="taskName" id="taskName" lay-search autocomplete="off">
+            <option value="">请选择项目名称</option>
             <option th:each=" list:${projectList}"
                     th:value="${list.projectId}"
                     th:text="${list.projectName}"
@@ -53,7 +60,7 @@
         <input type="text" id="beginDate" name="beginDate" autocomplete="off" class="layui-input" placeholder="开始时间" >
     </div>
     <div class="layui-inline layui-show-xs-block">
-        <input type="text" id="endDate" name="endDate" autocomplete="off" class="layui-input" placeholder="结束时间" >
+        <input type="text" id="endDate" name="endDate" autocomplete="off" class="layui-input" placeholder="交付时间" >
     </div>
     <div class="layui-inline layui-show-xs-block">
         <button class="layui-btn" id="layui-btn" data-type="reload">搜索</button>
@@ -96,13 +103,9 @@
             limit: 10,
             limits: [10,15,30],
             totalRow: true,
-            where:{
-                'taskName':taskName
-            },
             cols: [
                 [
                     {title: '序号', type: 'numbers',align:'center',width:70, totalRowText: '合计'},
-                    {title: '项目名称', field: 'projectName',align:'center',minWidth:150},
                     {title: '窗号', field: 'winNo',align:'center',minWidth:150},
                     {title: '类别', field: 'groupName',align:'center',minWidth:150,templet :function(d){
                            if(d.milestoneClass == '2'){

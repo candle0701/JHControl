@@ -287,6 +287,14 @@ public class StatisticsController {
     @RequestMapping("projectScheduleList")
     public JSONObject projectScheduleList(Model model, String taskName, int page, int limit){
         try {
+            JSONObject jsonObject=new JSONObject();
+            if(StringUtils.isEmpty(taskName) ){
+                jsonObject.put("msg","");
+                jsonObject.put("code",0);
+                jsonObject.put("count",0);
+                jsonObject.put("data","");
+                return jsonObject;
+            }
             MesProjectDetail mesProjectDetail=new MesProjectDetail();
             mesProjectDetail.setProjectId(taskName);
             PageHelper.startPage(page,limit);
@@ -295,7 +303,7 @@ public class StatisticsController {
              */
             List<MesProjectDetail> mesProjectDetailList=mesProjectDetailService.all(mesProjectDetail);
             PageInfo<MesProjectDetail> pageInfo = new PageInfo<>(mesProjectDetailList);
-            JSONObject jsonObject=new JSONObject();
+
             jsonObject.put("msg","");
             jsonObject.put("code",0);
             jsonObject.put("count",pageInfo.getTotal());
@@ -362,6 +370,7 @@ public class StatisticsController {
                 int count=(int)Integer.valueOf(list.get(0).getDoneNum())/Integer.valueOf(winModelCraft.getNumbers());
                 json.put("completion",count);
                 json.put("unfinished",Integer.valueOf(num)-count );
+                json.put("winNo",winNo);
                 jsonArray.add(json);
                 jsonObject.put("msg","");
                 jsonObject.put("code",0);
@@ -379,7 +388,7 @@ public class StatisticsController {
                      * 总需求量
                      */
                     projectDetail.setNumCount(String.valueOf(Integer.valueOf(num)*Integer.valueOf(projectDetail.getNumbers())));
-
+                    projectDetail.setWinNo(winNo);
                     MesProjectDetail MesProjectDetail=new MesProjectDetail();
                     MesProjectDetail.setDicId(projectDetail.getDicId());
                     MesProjectDetail.setWinNo(winNo);
@@ -673,6 +682,13 @@ public class StatisticsController {
     public JSONObject winList(Model model, String taskName,String beginDate,String endDate,int page, int limit,String buildingNo){
         try {
             JSONObject jsonObject=new JSONObject();
+            if(StringUtils.isEmpty(taskName) ){
+                jsonObject.put("msg","");
+                jsonObject.put("code",0);
+                jsonObject.put("count",0);
+                jsonObject.put("data","");
+                return jsonObject;
+            }
             MesBudgetTaskwork mesBudgetTaskwork=new MesBudgetTaskwork();
             mesBudgetTaskwork.setProjectId(taskName);
             mesBudgetTaskwork.setBeginDate(beginDate);
@@ -914,6 +930,14 @@ public class StatisticsController {
     public JSONObject projectWinList(Model model, String taskName,String beginDate,String endDate,int page, int limit){
         try {
             JSONObject jsonObject=new JSONObject();
+            if(StringUtils.isEmpty(taskName) ){
+                jsonObject.put("msg","");
+                jsonObject.put("code",0);
+                jsonObject.put("count",0);
+                jsonObject.put("data","");
+                return jsonObject;
+            }
+
             MesBudgetTaskwork mesBudgetTaskwork=new MesBudgetTaskwork();
             mesBudgetTaskwork.setProjectId(taskName);
             mesBudgetTaskwork.setBeginDate(beginDate);

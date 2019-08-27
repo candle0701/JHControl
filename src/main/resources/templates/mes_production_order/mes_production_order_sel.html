@@ -36,7 +36,12 @@
         .layui-form-select .layui-input {
             width: 250px;
         }
-
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color:transparent;
+        }
+        .layui-text em{
+            color:#999;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +49,7 @@
     <div class="layui-card-body ">
         <div class="layui-input-inline layui-show-xs-block">
             <select name="taskName" id="taskName"  lay-search class="taskName" autocomplete="off">
+                <option value="">请选择作业单</option>
                 <option th:each=" li:${list}"
                         th:value="${li.taskCode}"
                         th:text="${li.taskName}"
@@ -74,9 +80,6 @@
             page: true,
             limit: 10,
             limits: [10,15,30],
-            where:{
-                taskName:taskName
-            },
             cols: [
                 [
                     {title: '序号', type: 'numbers',align:'center',width:70},

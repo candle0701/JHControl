@@ -36,6 +36,12 @@
             background: url(/images/bg.png) no-repeat center;
             background-size: cover
         }
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color:transparent;
+        }
+        .layui-text em{
+            color:#999;
+        }
     </style>
 
 </head>
@@ -72,6 +78,7 @@
             cols: [
                 [
                     {title: '序号', type: 'numbers',align:'center',width:70},
+                    {title: '窗号', field: 'winNo',align:'center',minWidth:150},
                     {title: '名称', field: 'winTypeId',align:'center',minWidth:150},
                     {title: '总需求量', field: 'numCount',align:'center',minWidth:150},
                     {title: '完成数量', field: 'completion',align:'center',minWidth:150},

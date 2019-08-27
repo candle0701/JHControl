@@ -36,6 +36,12 @@
             background: url(/images/bg.png) no-repeat center;
             background-size: cover
         }
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color:transparent;
+        }
+        .layui-text em{
+            color:#999;
+        }
     </style>
 
 </head>
@@ -46,6 +52,7 @@
 
     <div class="layui-input-inline layui-show-xs-block">
         <select name="taskName" id="taskName"autocomplete="off" lay-search >
+            <option value="">请选择项目名称</option>
             <option th:each=" list:${projectList}"
                     th:value="${list.projectId}"
                     th:text="${list.projectName}"
@@ -79,7 +86,6 @@
             limit: 10,
             loading:true,
             limits: [10,15,30],
-            where:{'taskName':taskName},
             cols: [
                 [
                     {title: '序号', type: 'numbers',align:'center',width:70},

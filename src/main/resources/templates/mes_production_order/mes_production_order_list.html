@@ -98,17 +98,18 @@
                     {title: '生产开始时间', field: 'biginDate',align:'center',minWidth:125},
                     {title: '生产结束时间', field: 'endDate',align:'center',minWidth:125},
                     {title:'操作', align:'center',minWidth:300,templet:function (d) {
-                        if(d.status == '2'){
+                            /*      if(d.status == '2'){*/
                             return '  <a class="layui-btn layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">编辑</a>\n' +
                                 '    <a class="layui-btn layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>\n' +
                                 '    <a class="layui-btn layui-btn-xs" lay-event="status"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'17\'and ${menuButton.status}==\'1\'">订单状态</a>\n' +
                                 '    <a class="layui-btn layui-btn-xs" lay-event="audit"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'9\'and ${menuButton.status}==\'1\'">审核</a>'
-                        }else{
+
+               /*         }else{
                             return '  <a class="layui-btn layui-btn-disabled"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">编辑</a>\n' +
                                 '    <a class=" layui-btn layui-btn-disabled "  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>\n' +
                                 '    <a class="layui-btn layui-btn-xs" lay-event="status"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'17\'and ${menuButton.status}==\'1\'">订单状态</a>\n' +
                                 '    <a class="layui-btn layui-btn-xs" lay-event="audit"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'9\'and ${menuButton.status}==\'1\'">审核</a>'
-                        }
+                        }*/
 
                         }}
                 ]
