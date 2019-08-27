@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesProjectMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesProject">
+    <id column="PROJECT_ID" jdbcType="VARCHAR" property="projectId" />
+    <result column="PROJECT_NAME" jdbcType="VARCHAR" property="projectName" />
+    <result column="PROJECT_ADDRESS" jdbcType="VARCHAR" property="projectAddress" />
+    <result column="PROJECT_REMARK" jdbcType="VARCHAR" property="projectRemark" />
+    <result column="STATE" jdbcType="VARCHAR" property="state" />
+    <result column="CONTRACT" jdbcType="VARCHAR" property="contract" />
+    <result column="BDATE" jdbcType="VARCHAR" property="bdate" />
+    <result column="EDATE" jdbcType="VARCHAR" property="edate" />
+    <result column="MAN" jdbcType="VARCHAR" property="man" />
+    <result column="CHECKER" jdbcType="VARCHAR" property="checker" />
+    <result column="CHECK_DATE" jdbcType="VARCHAR" property="checkDate" />
+    <result column="DEL" jdbcType="VARCHAR" property="del" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    PROJECT_ID, PROJECT_NAME, PROJECT_ADDRESS, PROJECT_REMARK, STATE, CONTRACT, BDATE, 
+    EDATE, MAN, CHECKER, CHECK_DATE,DEL,CREATE_DATE
+  </sql>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.jh.entity.MesProject">
+    insert into MES_PROJECT (PROJECT_ID, PROJECT_NAME, PROJECT_ADDRESS, 
+      PROJECT_REMARK, STATE, CONTRACT, 
+      BDATE, EDATE, MAN, 
+      CHECKER, CHECK_DATE,DEL,CREATE_DATE)
+    values (#{projectId,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{projectAddress,jdbcType=VARCHAR}, 
+      #{projectRemark,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, #{contract,jdbcType=VARCHAR}, 
+      #{bdate,jdbcType=VARCHAR}, #{edate,jdbcType=VARCHAR}, #{man,jdbcType=VARCHAR},
+      #{checker,jdbcType=VARCHAR}, #{checkDate,jdbcType=VARCHAR}, #{del,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jh.entity.MesProject">
+    insert into MES_PROJECT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="projectId != null">
+        PROJECT_ID,
+      </if>
+      <if test="projectName != null">
+        PROJECT_NAME,
+      </if>
+      <if test="projectAddress != null">
+        PROJECT_ADDRESS,
+      </if>
+      <if test="projectRemark != null">
+        PROJECT_REMARK,
+      </if>
+      <if test="state != null">
+        STATE,
+      </if>
+      <if test="contract != null">
+        CONTRACT,
+      </if>
+      <if test="bdate != null">
+        BDATE,
+      </if>
+      <if test="edate != null">
+        EDATE,
+      </if>
+      <if test="man != null">
+        MAN,
+      </if>
+      <if test="checker != null">
+        CHECKER,
+      </if>
+      <if test="checkDate != null">
+        CHECK_DATE,
+      </if>
+      <if test="del != null">
+        DEL,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="projectId != null">
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null">
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectAddress != null">
+        #{projectAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="projectRemark != null">
+        #{projectRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="contract != null">
+        #{contract,jdbcType=VARCHAR},
+      </if>
+      <if test="bdate != null">
+        #{bdate,jdbcType=VARCHAR},
+      </if>
+      <if test="edate != null">
+        #{edate,jdbcType=VARCHAR},
+      </if>
+      <if test="man != null">
+        #{man,jdbcType=VARCHAR},
+      </if>
+      <if test="checker != null">
+        #{checker,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null">
+        #{checkDate,jdbcType=VARCHAR},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesProject">
+    update MES_PROJECT
+    <set>
+      <if test="projectName != null">
+        PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectAddress != null">
+        PROJECT_ADDRESS = #{projectAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="projectRemark != null">
+        PROJECT_REMARK = #{projectRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="contract != null">
+        CONTRACT = #{contract,jdbcType=VARCHAR},
+      </if>
+      <if test="bdate != null">
+        BDATE = #{bdate,jdbcType=VARCHAR},
+      </if>
+      <if test="edate != null">
+        EDATE = #{edate,jdbcType=VARCHAR},
+      </if>
+      <if test="man != null">
+        MAN = #{man,jdbcType=VARCHAR},
+      </if>
+      <if test="checker != null">
+        CHECKER = #{checker,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null">
+        CHECK_DATE = #{checkDate,jdbcType=VARCHAR},
+      </if>
+      <if test="del != null">
+        DEL = #{del,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jh.entity.MesProject">
+    update MES_PROJECT
+    set PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      PROJECT_ADDRESS = #{projectAddress,jdbcType=VARCHAR},
+      PROJECT_REMARK = #{projectRemark,jdbcType=VARCHAR},
+      STATE = #{state,jdbcType=VARCHAR},
+      CONTRACT = #{contract,jdbcType=VARCHAR},
+      BDATE = #{bdate,jdbcType=VARCHAR},
+      EDATE = #{edate,jdbcType=VARCHAR},
+      MAN = #{man,jdbcType=VARCHAR},
+      CHECKER = #{checker,jdbcType=VARCHAR},
+      CHECK_DATE = #{checkDate,jdbcType=VARCHAR},
+       DEL = #{del,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=VARCHAR}
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="find" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List"/>
+    from MES_PROJECT a
+    where a.DEL = #{del}
+    <if test="state != null ">
+      and  a.STATE = #{state}
+    </if>
+    <if test="projectName != null">
+    and  a.PROJECT_NAME = #{projectName}
+  </if>
+    order by  a.BDATE desc
+  </select>
+
+  <select id="findAllProject" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List"/>
+    from MES_PROJECT a
+    where a.DEL = #{del}
+    <if test="state != null ">
+    and  a.STATE = #{state}
+    </if>
+    <if test="projectName != null">
+      and  a.PROJECT_NAME like '%'||#{projectName}||'%'
+    </if>
+    order by  a.BDATE desc
+  </select>
+
+  <select id="findList" resultType="com.jh.entity.MesProject">
+    select
+         *
+     from
+    (select t.*,rownum rownu from MES_PROJECT t
+    where T.DEL = #{mesProject.del}
+    <if test="mesProject.state != null ">
+      and  t.STATE = #{mesProject.state}
+    </if>
+    <if test="mesProject.projectName != null">
+      and  t.PROJECT_NAME like '%'||#{mesProject.projectName}||'%'
+    </if>
+    <if test="mesProject.projectName != null">
+      and  t.PROJECT_NAME like '%'||#{mesProject.projectName}||'%'
+    </if>
+    and   rownum &lt;=  #{limit}
+    order by  t.CREATE_DATE desc  ) tt
+    where tt.rownu>  #{page}
+
+  </select>
+
+
+  <select id="selectByPrimaryKey" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List" />
+    from MES_PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="findUp" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List"/>
+    from MES_PROJECT a
+    where a.DEL = #{del}
+    and  a.PROJECT_NAME = #{projectName}
+    and a.PROJECT_ID != #{projectId}
+  </select>
+
+  <select id="selAll" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List"/>
+    from MES_PROJECT a
+  </select>
+
+
+  <select id="sel" resultType="com.jh.entity.MesProject">
+    select
+    <include refid="Base_Column_List"/>
+    from MES_PROJECT a
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </select>
+
+
+
+
+
+
+
+
+  <delete id="del" parameterType="java.lang.String">
+    delete from MES_PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </delete>
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>员工自助查询</title>
+  <meta name="renderer" content="webkit|ie-comp|ie-stand">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="stylesheet" href="/css/font.css" />
+  <link rel="stylesheet" href="/css/xadmin.css" />
+  <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+  <script src="/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/js/xadmin.js"></script>
+  <script type="text/javascript" src="/js/ajax-util.js"></script>
+  <script type="text/javascript" src="/js/cookie.js"></script>
+  <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="/pagination/jquery.pagination.js"></script>
+  <style>
+    body {
+      background: url(/images/bg.png) no-repeat center;
+      background-size: cover
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="x-body">
+  <div class="layui-row">
+    <div class="layui-form layui-col-md12 x-so">
+      <input id="beginTime"  placeholder="请输入开始时间" class="layui-input test-item">
+      <input placeholder="请输入结束时间"  id="endTime" class="layui-input test-item">
+      <button class="layui-btn"  th:onclick="search()" ><i class="layui-icon">&#xe615;</i>查询</button>
+    </div>
+  </div>
+  <div id="frenshDiv" th:fragment="table_refresh">
+    <xblock>
+      <input type="hidden" id="totalPages" th:value="${salaryList.pages}"/>
+      <span class="x-center" style="line-height:40px;font-weight:bold;">工资总计：<span th:text="${totalSalary}"></span> 元</span>
+      <span  id="total" th:text="${salaryList.total}" style="display:none;"></span>
+      <!--<span class="x-right" style="line-height:40px">工资总计：<span th:text="${numbers.formatDecimal(totalSalary/100.0,1,2)}"></span> 元</span>-->
+    </xblock>
+    <table class="layui-table">
+      <thead>
+      <tr>
+        <th>员工</th>
+        <th>作业单编号</th>
+        <th>作业单名称</th>
+        <th>工序</th>
+        <th>数量</th>
+        <th>日期</th>
+        <th>单价</th>
+        <th>当日工资</th>
+      </thead>
+      <tbody>
+      <tr th:each="salary : ${salaryList.list}">
+
+        <td th:text="${salary.nickname}">admin</td>
+        <td th:text="${salary.taskId}">admin</td>
+        <td th:text="${salary.taskName}">18925139194</td>
+        <td th:text="${salary.name}">113664000@qq.com</td>
+        <td th:text="${salary.doneNum}">超级管理员</td>
+        <td th:text="${salary.reportTime}">admin</td>
+        <td th:text="${salary.price}">18925139194</td>
+        <td th:text="${salary.price}*${salary.doneNum}">超级管理员</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="page" class="page" th:if="${salaryList.total gt 10}"></div>
+</div>
+<script>
+
+    layui.use(['laydate'], function(){
+        var laydate = layui.laydate;
+
+        var beginTime = laydate.render({
+            elem: "#beginTime",
+            format:'yyyy-MM-dd',
+            trigger: 'click',//解决弹出页面时插件闪退
+            done:function(value,date){
+                if(value!=""){
+                    date.month=date.month-1;
+                    endTime.config.min=date;
+                }else{
+                    endTime.config.min=beginTime.config.min;
+                }
+            },
+        });
+
+        var endTime = laydate.render({
+            elem: "#endTime",
+            format:'yyyy-MM-dd',
+            trigger: 'click',//解决弹出页面时插件闪退
+            done:function(value,date){
+                if(value!=""){
+                    date.month=date.month-1;
+                    beginTime.config.max=date;
+                }else{
+                    beginTime.config.max=endTime.config.max;
+                }
+            }
+        });
+    })
+  
+    var currentPage = '';
+    $(function(){
+        currentPage = $("#totalPages").val();
+        pageinit(currentPage);
+    })
+
+    function pageinit(curr){
+        $('#page').pagination({
+            coping: true,
+            homePage: '首页',
+            endPage: '末页',
+            prevContent: '上一页',
+            nextContent: '下一页',
+            pageCount: curr,
+            callback: function (api) {
+                var url = '/mesBudgetTaskwork/toSalaryPage?pageNum='+api.getCurrent()+'&type=1'+
+                    '&endTime='+$.trim($("#endTime").val())+'&beginTime='+$.trim($("#beginTime").val())
+                $('#frenshDiv').load(url);
+            }
+        });
+    }
+
+    function search(){
+        var url = '/mesBudgetTaskwork/toSalaryPage?pageNum=1&beginTime='+$.trim($("#beginTime").val())
+        +'&endTime='+$.trim($("#endTime").val())+'&type=1'
+        $('#frenshDiv').load(url,'',function () {
+            //查询后页数改变，重新加载分页
+            currentPage = $("#totalPages").val();
+            pageinit(currentPage);
+
+            if(parseInt($("#total").text())<=10){
+                $("#page").attr("style", "display:none");
+            }else{
+                $("#page").attr("style", "display:block");
+            }
+        });
+
+    }
+
+    function company_del(obj,companyId){
+        layer.confirm('确认要删除吗？',function(){
+            $.ajax({
+                url:'/mesCompany/deleteByPrimaryKey',
+                data:{
+                    'companyId':companyId
+                },
+                success:function(res){
+                    if(res.status){
+                        location.reload();
+                        layer.msg(res.msg,{icon:1,time:1000});
+                    }else{
+                        layer.msg(res.msg,{icon:1,time:1000});
+                    }
+                }
+            })
+        });
+    }
+</script>
+</body>
+
+</html>

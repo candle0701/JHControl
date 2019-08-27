@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+  
+  <head>
+      <meta charset="UTF-8">
+      <title>人员编辑</title>
+      <meta name="renderer" content="webkit|ie-comp|ie-stand">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+      <meta http-equiv="Cache-Control" content="no-siteapp" />
+      <link rel="stylesheet" href="/css/font.css" />
+      <link rel="stylesheet" href="/css/xadmin.css" />
+      <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+      <script src="/lib/layui/layui.js" charset="utf-8"></script>
+      <script type="text/javascript" src="/js/xadmin.js"></script>
+      <script type="text/javascript" src="/js/ajax-util.js"></script>
+      <script type="text/javascript" src="/js/cookie.js"></script>
+      <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+      <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-body">
+            <input id="id" style="display:none;" th:value="${mesUsers.id}"/>
+          <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                  <span class="x-red">*</span>员工编号：
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="username" name="username"  th:value="${mesUsers.username}" class="layui-input" onkeyup="checkName(this)">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>将会成为您唯一的员工编号
+              </div>
+          </div>
+        <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                  姓名：
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="nickname" name="nickname"  th:value="${mesUsers.nickname}" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="tel" class="layui-form-label">
+                  手机：
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" th:value="${mesUsers.tel}" id="tel" name="tel"  lay-verify="tel"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="address" class="layui-form-label">
+                  地址：
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" th:value="${mesUsers.address}" id="address" name="address"  lay-verify="address"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" onclick="edit_users()">
+                  提交
+              </button>
+          </div>
+    </div>
+    <script>
+        function checkName(obj){
+            var id = $("#id").val();
+            var username = $.trim($("#username").val());
+            $.ajax({
+                url: '/mesUsers/check',
+                data: {
+                    'id': id,
+                    'username': username
+                },
+                success: function (res) {
+                    if (res.status) {
+
+                    }else{
+                        layer.msg(res.msg, {icon: 1, time: 1000});
+                    }
+                }
+            })
+        }
+        function edit_users(){
+            var id = $("#id").val();
+            var username = $.trim($("#username").val());
+            var nickname = $.trim($("#nickname").val());
+            var address = $.trim($("#address").val());
+            var tel = $.trim($("#tel").val());
+            if(username==""){
+                layer.msg("请输入员工编号",{icon:1,time:1000});
+                return;
+            }
+            layer.confirm('确认要提交吗？',function() {
+                $.ajax({
+                    url: '/mesUsers/mesUsersEdit',
+                    data: {
+                        'id': id,
+                        'username': username,
+                        'nickname': nickname,
+                        'address':address,
+                        'tel':tel
+                    },
+                    type: 'POST',
+                    async: true,
+                    beforeSend: function () {
+                        return layer.msg('拼命执行中...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto', time:100000});
+                    },
+                    success: function (res) {
+                        if (res.status) {
+                            window.parent.location.reload();
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            layer.msg(res.msg, {icon: 1, time: 1000});
+                        }else{
+                            layer.msg(res.msg, {icon: 1, time: 1000});
+                        }
+                    }
+                })
+            });
+        }
+    </script>
+  </body>
+
+</html>

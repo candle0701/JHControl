@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesTaskDetailMapper">
+    <resultMap id="BaseResultMap" type="com.jh.entity.MesTaskDetail">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="TASK_ID" jdbcType="VARCHAR" property="taskId"/>
+        <result column="NUM" jdbcType="VARCHAR" property="num"/>
+        <result column="TASK_WIN_TYPE" jdbcType="VARCHAR" property="taskWinType"/>
+        <result column="UNIT_TYPE" jdbcType="VARCHAR" property="unitType"/>
+        <result column="WIN_NO" jdbcType="VARCHAR" property="winNo"/>
+        <result column="DEL" jdbcType="VARCHAR" property="del"/>
+        <result column="TASK_WIN_NAME" jdbcType="VARCHAR" property="taskWinName"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    ID, TASK_ID, NUM, TASK_WIN_TYPE, UNIT_TYPE, WIN_NO,DEL,TASK_WIN_NAME
+  </sql>
+
+  <select id="selectByTaskId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MES_TASK_DETAIL
+    where 1=1 and del = '0' and task_id = #{taskId,jdbcType=VARCHAR}
+  </select>
+
+    <select id="ifUsedByTaskIdWinNoTaskWinType" parameterType="string" resultType="com.jh.entity.MesTaskDetail">
+        SELECT
+            task_win_type
+        FROM
+            ( SELECT * FROM mes_task_detail WHERE del = '0' AND task_win_type IS NOT NULL ) mtd
+            LEFT JOIN mes_task mt ON mtd.task_id = mt.id
+            AND mt.del = '0'
+        WHERE
+            mt.PROJECT_ID = #{projectId}
+            AND mtd.win_no = #{winNo}
+        GROUP BY
+            task_win_type
+    </select>
+
+
+    <select id="getTaskNumByWinNoAndTaskId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from MES_TASK_DETAIL
+        where 1=1 and del = '0' and task_id = #{taskId,jdbcType=VARCHAR} and win_no = #{winNo}
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from MES_TASK_DETAIL
+        where 1=1 and del = '0' and ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_TASK_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+    <delete id="deleteByTaskId" parameterType="java.lang.String">
+    delete from MES_TASK_DETAIL
+    where task_id = #{taskId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jh.entity.MesTaskDetail">
+    insert into MES_TASK_DETAIL (ID, TASK_ID, NUM, 
+      TASK_WIN_TYPE, UNIT_TYPE, WIN_NO,DEL,TASK_WIN_NAME
+      )
+    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{num,jdbcType=VARCHAR}, 
+      #{taskWinType,jdbcType=VARCHAR}, #{unitType,jdbcType=VARCHAR}, #{winNo,jdbcType=VARCHAR},
+      #{del,jdbcType=VARCHAR},#{taskWinName,jdbcType=VARCHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.jh.entity.MesTaskDetail">
+        insert into MES_TASK_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="taskId != null">
+                TASK_ID,
+            </if>
+            <if test="num != null">
+                NUM,
+            </if>
+            <if test="taskWinType != null">
+                TASK_WIN_TYPE,
+            </if>
+            <if test="unitType != null">
+                UNIT_TYPE,
+            </if>
+            <if test="winNo != null">
+                WIN_NO,
+            </if>
+            <if test="del != null">
+                DEL,
+            </if>
+            <if test="taskWinName != null">
+                TASK_WIN_NAME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="taskId != null">
+                #{taskId,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinType != null">
+                #{taskWinType,jdbcType=VARCHAR},
+            </if>
+            <if test="unitType != null">
+                #{unitType,jdbcType=VARCHAR},
+            </if>
+            <if test="winNo != null">
+                #{winNo,jdbcType=VARCHAR},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinName != null">
+                #{taskWinName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesTaskDetail">
+        update MES_TASK_DETAIL
+        <set>
+            <if test="taskId != null">
+                TASK_ID = #{taskId,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                NUM = #{num,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinType != null">
+                TASK_WIN_TYPE = #{taskWinType,jdbcType=VARCHAR},
+            </if>
+            <if test="unitType != null">
+                UNIT_TYPE = #{unitType,jdbcType=VARCHAR},
+            </if>
+            <if test="winNo != null">
+                WIN_NO = #{winNo,jdbcType=VARCHAR},
+            </if>
+            <if test="del != null">
+                DEL = #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinName != null">
+                TASK_WIN_NAME = #{taskWinName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByTaskId" parameterType="com.jh.entity.MesTaskDetail">
+        update MES_TASK_DETAIL
+        <set>
+            <if test="num != null">
+                NUM = #{num,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinType != null">
+                TASK_WIN_TYPE = #{taskWinType,jdbcType=VARCHAR},
+            </if>
+            <if test="winNo != null">
+                WIN_NO = #{winNo,jdbcType=VARCHAR},
+            </if>
+            <if test="del != null">
+                DEL = #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinName != null">
+                TASK_WIN_NAME = #{taskWinName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where TASK_ID = #{taskId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jh.entity.MesTaskDetail">
+    update MES_TASK_DETAIL
+    set TASK_ID = #{taskId,jdbcType=VARCHAR},
+      NUM = #{num,jdbcType=VARCHAR},
+      TASK_WIN_TYPE = #{taskWinType,jdbcType=VARCHAR},
+      UNIT_TYPE = #{unitType,jdbcType=VARCHAR},
+      WIN_NO = #{winNo,jdbcType=VARCHAR},
+      DEL = #{del,jdbcType=VARCHAR},
+      TASK_WIN_NAME = #{taskWinName,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+
+    <select id="findMap" resultType="java.util.HashMap">
+        SELECT
+        MES_DICTIONARIES.DIC_ID AS "dicId",
+        MES_PRODUCTION_ORDER.ORDER_CODE AS "orderCode",
+        MES_TASK.Id AS "taskId",
+        MES_TASK.TASK_NAME AS "taskName",
+        MES_TASK.DOWN_TIME AS "taskDownTime",
+        MES_TASK.DELIVERY_TIME AS "taskDeliveryTime",
+        MES_PRODUCTION_ORDER.PROCESS_DATE AS "orderProcessDate",
+        MES_PRODUCTION_ORDER.BIGIN_DATE AS "orderBiginDate",
+        MES_PRODUCTION_ORDER.END_DATE AS "orderEndDate",
+        MES_TASK_DETAIL.WIN_NO AS "winCode",
+        MES_PROJECT_DETAIL.WIN_TYPE_ID AS "winName",
+        MES_WIN_MODEL_CRAFT.NUMBERS AS "numbers",
+        MES_DICTIONARIES.NAME AS "name",
+        MES_TASK_DETAIL.NUM AS "taskDetailNum",
+        MES_TASK.TASK_STATUS AS "taskStatus",
+        MES_PRODUCTION_ORDER.STATUS AS "orderStatus",
+        (
+        SELECT COALESCE
+        ( SUM( to_number ( MES_BUDGET_TASKWORK.DONE_NUM ) ), 0 )
+        FROM
+        MES_BUDGET_TASKWORK
+        WHERE
+        MES_BUDGET_TASKWORK.MILESTONE = '1'
+        AND MES_BUDGET_TASKWORK.PROCESS_LEVEL = MES_DICTIONARIES.DIC_ID
+        AND MES_BUDGET_TASKWORK.WIN_NO = MES_TASK_DETAIL.WIN_NO
+        AND MES_BUDGET_TASKWORK.TASK_ID = MES_TASK.ID
+        ) AS "num",
+        (
+        SELECT
+        MES_BUDGET_TASKWORK.PROCEDURE_ID
+        FROM
+        MES_BUDGET_TASKWORK
+        WHERE
+        MES_BUDGET_TASKWORK.MILESTONE = '1'
+        AND MES_BUDGET_TASKWORK.PROCESS_LEVEL = MES_DICTIONARIES.DIC_ID
+        AND MES_BUDGET_TASKWORK.WIN_NO = MES_TASK_DETAIL.WIN_NO
+        AND MES_BUDGET_TASKWORK.TASK_ID = MES_TASK.ID
+        GROUP BY
+        MES_BUDGET_TASKWORK.PROCEDURE_ID
+        ) AS "procedureId",
+        (
+        SELECT
+        MES_BUDGET_TASKWORK.TASK_WIN_TYPE
+        FROM
+        MES_BUDGET_TASKWORK
+        WHERE
+        MES_BUDGET_TASKWORK.MILESTONE = '1'
+        AND MES_BUDGET_TASKWORK.PROCESS_LEVEL = MES_DICTIONARIES.DIC_ID
+        AND MES_BUDGET_TASKWORK.WIN_NO = MES_TASK_DETAIL.WIN_NO
+        AND MES_BUDGET_TASKWORK.TASK_ID = MES_TASK.ID
+        GROUP BY
+        MES_BUDGET_TASKWORK.TASK_WIN_TYPE
+        ) AS "taskWinType"
+        FROM
+        MES_TASK_DETAIL
+        LEFT JOIN MES_PROJECT_DETAIL ON MES_TASK_DETAIL.WIN_NO = MES_PROJECT_DETAIL.WIN_NO
+        LEFT JOIN MES_TASK ON MES_TASK_DETAIL.TASK_ID = MES_TASK.ID
+        LEFT JOIN MES_WIN_MODEL ON MES_TASK_DETAIL.TASK_WIN_TYPE = MES_WIN_MODEL.
+        CODE RIGHT JOIN MES_WIN_MODEL_CRAFT ON MES_WIN_MODEL_CRAFT.WIN_MODEL_ID = MES_WIN_MODEL.WIN_ID
+        LEFT JOIN MES_DICTIONARIES ON MES_DICTIONARIES.DIC_ID = MES_WIN_MODEL_CRAFT.
+        NAME LEFT JOIN MES_PRODUCTION_ORDER ON MES_TASK.ID = MES_PRODUCTION_ORDER.TASK_CODE
+        WHERE
+        MES_TASK.PROJECT_ID=MES_PROJECT_DETAIL.PROJECT_ID
+        and  MES_TASK_DETAIL.DEL = '0'
+        AND MES_TASK.DEL = '0'
+        AND MES_WIN_MODEL.DEL = '0'
+        AND MES_WIN_MODEL_CRAFT.DEL = '0'
+        AND MES_WIN_MODEL_CRAFT.CODE = '2'
+        AND MES_PRODUCTION_ORDER.DEL = '0'
+        <if test="taskName != null and taskName != '' ">
+            AND MES_TASK.ID =#{taskName}
+        </if>
+        ORDER BY
+        MES_TASK_DETAIL.WIN_NO,
+        MES_TASK.ID,
+        MES_WIN_MODEL.WIN_NAME
+
+    </select>
+
+
+    <select id="allCount" resultType="com.jh.entity.MesTaskDetail">
+        SELECT
+        COALESCE
+        ( SUM( to_number ( MES_TASK_DETAIL.NUM ) ), 0 ) AS "num"
+        FROM
+        MES_TASK_DETAIL
+        LEFT JOIN MES_TASK ON MES_TASK.ID = MES_TASK_DETAIL.TASK_ID
+        WHERE
+        MES_TASK_DETAIL.del='0'
+        and MES_TASK.del='0'
+        AND MES_TASK_DETAIL.WIN_NO = #{winNo}
+        AND MES_TASK.PROJECT_ID =#{projectId}
+        <if test="buildingNo != null  and  buildingNo != ''">
+            AND MES_TASK.BUILDING_NO=#{buildingNo}
+        </if>
+        <if test="beginDate != null  and  beginDate != ''">
+            AND to_date ( MES_TASK.CREATE_TIME, 'yyyy-mm-dd' ) &gt;= to_date ( #{beginDate}, 'yyyy-mm-dd' )
+        </if>
+        <if test="endDate != null  and  endDate != ''">
+            AND to_date ( MES_TASK.CREATE_TIME, 'yyyy-mm-dd' ) &lt;= to_date ( #{endDate}, 'yyyy-mm-dd' )
+        </if>
+        GROUP BY
+        MES_TASK.PROJECT_ID,
+        MES_TASK_DETAIL.WIN_NO
+    </select>
+
+    <select id="list" resultType="com.jh.entity.MesTaskDetail">
+  SELECT
+	MES_DICTIONARIES.NAME as "winNo"
+  FROM
+      MES_TASK_DETAIL
+  RIGHT JOIN MES_WIN_MODEL ON MES_TASK_DETAIL.TASK_WIN_TYPE = MES_WIN_MODEL.CODE
+  LEFT join  MES_DICTIONARIES on  MES_DICTIONARIES.DIC_ID=MES_WIN_MODEL.WIN_DICTIONARIES_ID
+  where 	MES_TASK_DETAIL.WIN_NO= #{winNo}
+  </select>
+
+
+    <select id="find" resultType="com.jh.entity.MesTaskDetail">
+    SELECT
+       *
+    FROM
+        MES_TASK_DETAIL
+    where
+     	del=#{del}
+    and
+      TASK_WIN_TYPE = #{taskWinType}
+  </select>
+
+    <select id="selAll" resultType="com.jh.entity.MesTaskDetail">
+       SELECT
+            MES_TASK_DETAIL.ID
+        FROM
+            MES_TASK_DETAIL
+            RIGHT JOIN MES_WIN_MODEL ON MES_WIN_MODEL.CODE = MES_TASK_DETAIL.TASK_WIN_TYPE
+        WHERE
+            MES_WIN_MODEL.WIN_ID = #{winModel}
+            AND MES_WIN_MODEL.DEL = '0'
+            AND MES_TASK_DETAIL.DEL = '0'
+    </select>
+
+
+    <select id="selcount" resultType="com.jh.entity.MesTaskDetail">
+          SELECT
+            COALESCE ( SUM( to_number ( MES_TASK_DETAIL.NUM ) ), 0 ) as "num"
+            FROM
+                MES_TASK_DETAIL
+                LEFT JOIN MES_TASK ON  MES_TASK_DETAIL.TASK_ID = MES_TASK.ID
+            WHERE
+                MES_TASK_DETAIL.WIN_NO = #{winNo}
+                AND MES_TASK.PROJECT_ID =#{projectId}
+                and MES_TASK_DETAIL.DEL='0'
+                and MES_TASK.DEL='0'
+                GROUP BY MES_TASK_DETAIL.WIN_NO,
+                MES_TASK.PROJECT_ID
+     </select>
+    <select id="sel" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM MES_TASK_DETAIL
+        WHERE 1=1 and del = '0' AND task_id = #{taskId,jdbcType=VARCHAR} AND TASK_WIN_TYPE IS NOT NULL
+    </select>
+
+    <select id="countDate" resultType="com.jh.entity.MesTaskDetail">
+        SELECT COALESCE
+           	( SUM( to_number(MES_WIN_MODEL_CRAFT.NUMBERS)*( to_number ( MES_PROCESS_QUOTA.REALITY_DATE ) + to_number ( MES_PROCESS_QUOTA.ASSIST_DATE ) ) ), 0 )  as "countDate"
+        FROM
+            MES_TASK
+            LEFT JOIN MES_TASK_DETAIL ON MES_TASK_DETAIL.TASK_ID = MES_TASK.ID
+            LEFT JOIN MES_WIN_MODEL ON MES_WIN_MODEL.CODE = MES_TASK_DETAIL.TASK_WIN_TYPE
+            RIGHT JOIN MES_WIN_MODEL_CRAFT ON MES_WIN_MODEL_CRAFT.WIN_MODEL_ID = MES_WIN_MODEL.WIN_ID
+            LEFT JOIN MES_PROCESS_QUOTA ON MES_WIN_MODEL_CRAFT.NAME = MES_PROCESS_QUOTA.ID
+        WHERE
+            MES_TASK_DETAIL.DEL = '0'
+            AND MES_WIN_MODEL.DEL = '0'
+            AND MES_WIN_MODEL_CRAFT.DEL = '0'
+            AND MES_PROCESS_QUOTA.STATUS =  #{dicId}
+            AND MES_PROCESS_QUOTA.TYPE = '1'
+            AND MES_TASK_DETAIL.WIN_NO = #{winNo}
+            and MES_TASK.ID=#{taskId}
+    </select>
+</mapper>

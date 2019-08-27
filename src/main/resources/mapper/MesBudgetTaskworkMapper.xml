@@ -1,0 +1,986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesBudgetTaskworkMapper">
+    <resultMap id="BaseResultMap" type="com.jh.entity.MesBudgetTaskwork">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="TASK_ID" jdbcType="VARCHAR" property="taskId"/>
+        <result column="PROCEDURE_ID" jdbcType="VARCHAR" property="procedureId"/>
+        <result column="TASKMAN_ID" jdbcType="VARCHAR" property="taskmanId"/>
+        <result column="DONE_NUM" jdbcType="VARCHAR" property="doneNum"/>
+        <result column="REPORT_TIME" jdbcType="VARCHAR" property="reportTime"/>
+        <result column="CHECKER" jdbcType="VARCHAR" property="checker"/>
+        <result column="CHECK_STATUS" jdbcType="VARCHAR" property="checkStatus"/>
+        <result column="WIN_NO" jdbcType="VARCHAR" property="winNo"/>
+        <result column="PROCESS_GROUP" jdbcType="VARCHAR" property="processGroup"/>
+        <result column="TASK_NUM" jdbcType="VARCHAR" property="taskNum"/>
+        <result column="REASON" jdbcType="VARCHAR" property="reason"/>
+        <result column="MILESTONE" jdbcType="VARCHAR" property="milestone"/>
+        <result column="MILESTONE_CLASS" jdbcType="VARCHAR" property="milestoneClass"/>
+        <result column="PROJECT_ID" jdbcType="VARCHAR" property="projectId"/>
+        <result column="PROCESS_LEVEL" jdbcType="VARCHAR" property="processLevel"/>
+        <result column="TASK_WIN_TYPE" jdbcType="VARCHAR" property="taskWinType"/>
+        <result column="TASK_WIN_TYPE_NAME" jdbcType="VARCHAR" property="taskWinTypeName"/>
+        <result column="TOTAL_NUM" jdbcType="VARCHAR" property="totalNum"/>
+        <collection property="mesUsers" ofType="com.jh.entity.MesUsers">
+            <id column="ID" jdbcType="VARCHAR" property="id"/>
+            <result column="CODE" jdbcType="VARCHAR" property="code"/>
+            <result column="USERNAME" jdbcType="VARCHAR" property="username"/>
+            <result column="TEL" jdbcType="VARCHAR" property="tel"/>
+            <result column="ADDRESS" jdbcType="VARCHAR" property="address"/>
+            <result column="SEX" jdbcType="VARCHAR" property="sex"/>
+            <result column="BIRTH" jdbcType="TIMESTAMP" property="birth"/>
+            <result column="DUTY" jdbcType="VARCHAR" property="duty"/>
+            <result column="NOTE" jdbcType="VARCHAR" property="note"/>
+            <result column="VALID" jdbcType="VARCHAR" property="valid"/>
+            <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+            <result column="CAPABILITY" jdbcType="VARCHAR" property="capability"/>
+            <result column="CAPABILITY1" jdbcType="VARCHAR" property="capability1"/>
+            <result column="STATUS" jdbcType="VARCHAR" property="status"/>
+            <result column="SALT" jdbcType="VARCHAR" property="salt"/>
+            <result column="NICKNAME" jdbcType="VARCHAR" property="nickname"/>
+        </collection>
+        <collection property="mesProcessQuota" ofType="com.jh.entity.MesProcessQuota">
+            <result column="ID" jdbcType="VARCHAR" property="id"/>
+            <result column="CODE" jdbcType="VARCHAR" property="code"/>
+            <result column="NAME" jdbcType="VARCHAR" property="name"/>
+            <result column="UNIT" jdbcType="VARCHAR" property="unit"/>
+            <result column="PRICE" jdbcType="VARCHAR" property="price"/>
+            <result column="UNIT_PRICE" jdbcType="VARCHAR" property="unitPrice"/>
+            <result column="REALITY_DATE" jdbcType="VARCHAR" property="realityDate"/>
+            <result column="ASSIST_DATE" jdbcType="VARCHAR" property="assistDate"/>
+            <result column="TYPE" jdbcType="VARCHAR" property="type"/>
+            <result column="STATUS" jdbcType="VARCHAR" property="status"/>
+            <result column="DEL" jdbcType="VARCHAR" property="del"/>
+            <result column="TEAM_GROUP" jdbcType="VARCHAR" property="teamGroup"/>
+            <result column="MILESTONE" jdbcType="VARCHAR" property="milestone"/>
+        </collection>
+        <collection property="mesDictionaries" ofType="com.jh.entity.MesDictionaries">
+            <result column="DIC_ID" jdbcType="VARCHAR" property="dicId" />
+            <result column="NAME" jdbcType="VARCHAR" property="name" />
+            <result column="TYPE" jdbcType="VARCHAR" property="type" />
+            <result column="CREATION_DATE" jdbcType="VARCHAR" property="creationDate" />
+            <result column="UPDATE_DATE" jdbcType="VARCHAR" property="updateDate" />
+            <result column="STATUS" jdbcType="VARCHAR" property="status" />
+            <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+            <result column="VALUE" jdbcType="VARCHAR" property="value" />
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+    ID, TASK_ID, PROCEDURE_ID, TASKMAN_ID, DONE_NUM, REPORT_TIME, CHECKER, CHECK_STATUS, 
+    WIN_NO, PROCESS_GROUP,TASK_NUM,REASON,MILESTONE,MILESTONE_CLASS,PROJECT_ID,PROCESS_LEVEL,TASK_WIN_TYPE,TASK_WIN_TYPE_NAME,TOTAL_NUM
+  </sql>
+
+    <!-- dealPage Start-->
+    <select id="dealSelectWinNo" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select win_no from MES_BUDGET_TASKWORK where task_id=#{taskId} group by win_no order by win_no
+    </select>
+    <select id="dealSelectModelName" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select mbt.procedure_id,mpq.name from (select procedure_id from MES_BUDGET_TASKWORK where task_id=#{taskId} group by procedure_id) mbt
+        left join MES_PROCESS_QUOTA mpq on mpq.id=mbt.procedure_id
+        order by  NLSSORT( mpq.name,'NLS_SORT = SCHINESE_PINYIN_M')
+    </select>
+    <select id="dealGetNumbers" resultType="com.jh.entity.MesBudgetTaskwork" parameterType="java.lang.String">
+        SELECT
+            mwmc.numbers
+        FROM
+            (select task_win_type,procedure_id from MES_BUDGET_TASKWORK group by task_win_type,procedure_id) mbt
+            left join mes_win_model mwm ON mbt.TASK_WIN_TYPE = mwm.code
+            AND del = '0' left join MES_WIN_MODEL_CRAFT mwmc ON mwm.win_id = mwmc.win_model_id
+            AND mwmc.del = '0'
+            AND mbt.procedure_id = mwmc.name
+            AND mwmc.code = '4'
+            where mbt.procedure_id = #{procedureId} and mbt.task_win_type = #{taskWinType}
+    </select>
+    <select id="selectByTaskmanId1" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select md.name processGroupName,b.* from (SELECT
+        a.process_group,
+        a.win_no,
+        a.NAME,
+        mtd.num,
+        a.done_num,
+        a.procedure_id,
+        a.task_win_type
+        FROM
+        (
+        SELECT
+        mbt.process_group,
+        mbt.task_id,
+        mbt.win_no,
+        mpq.NAME,
+        mbt.done_num,
+        mbt.procedure_id,
+        mbt.task_win_type
+        FROM
+        ( SELECT max(process_group) process_group,
+        max(task_win_type) task_win_type,task_id, win_no, PROCEDURE_ID, sum( done_num ) done_num
+        FROM (select * from MES_BUDGET_TASKWORK
+        where 1=1
+        <if test="userProcessGroup!=null">
+            and process_group = #{userProcessGroup}
+        </if>
+        ) WHERE task_id = #{taskId
+        } GROUP BY task_id, win_no, procedure_id ) mbt
+        LEFT JOIN MES_PROCESS_QUOTA mpq ON mpq.id = mbt.PROCEDURE_ID
+        ) a
+        LEFT JOIN mes_task_detail mtd ON a.task_id = mtd.task_id and mtd.TASK_WIN_TYPE = a.TASK_WIN_TYPE  and mtd.win_no = a.win_no
+        AND mtd.del = '0'
+        where 1=1
+        <if test="winNo != null and winNo != ''">
+            and a.win_no = #{winNo,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != ''">
+            and a.NAME = #{name,jdbcType=VARCHAR}
+        </if>
+        ORDER BY a.win_no,to_number(a.process_group)) b left join mes_dictionaries md on b.process_group = md.dic_id
+
+    </select>
+    <select id="selectByTaskmanId2" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select
+        mbt.id,mu.username,mu.nickname,mbt.win_no,md.name processGroupName,mpq.name,mbt.done_num,mbt.report_time,mbt.reason
+        from (select * from MES_BUDGET_TASKWORK
+        where 1=1
+        <if test="userProcessGroup!=null">
+            and process_group = #{userProcessGroup}
+        </if>
+        ) mbt
+        left join mes_users mu on mbt.taskman_id = mu.username
+        left join mes_process_quota mpq on mbt.procedure_id = mpq.id
+        left join MES_DICTIONARIES md on mbt.process_group = md.dic_id
+        where 1=1
+        <if test="taskmanId != null and taskmanId != ''">
+            and mbt.TASKMAN_ID = #{taskmanId,jdbcType=VARCHAR}
+        </if>
+        <if test="taskId != null">
+            and mbt.TASK_ID = #{taskId,jdbcType=VARCHAR}
+        </if>
+        <if test="winNo != null and winNo != ''">
+            and mbt.win_no = #{winNo,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != ''">
+            and mpq.name = #{name,jdbcType=VARCHAR}
+        </if>
+        order by to_number(md.dic_id),mu.nickname
+    </select>
+    <select id="getDealProblem" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+            mu.username,
+            mu.nickname,
+            mt.task_name,
+            md.NAME,
+            mpq.NAME mpqName,
+            mbt.*
+        FROM
+            MES_BUDGET_TASKWORK mbt
+            LEFT JOIN mes_task mt ON mt.id = mbt.task_id
+            LEFT JOIN mes_users mu ON mbt.taskman_id = mu.username
+            LEFT JOIN mes_dictionaries md ON mbt.PROCESS_GROUP = md.dic_id
+            LEFT JOIN MES_PROCESS_QUOTA mpq ON mbt.PROCEDURE_ID = mpq.id
+        WHERE
+            mbt.id = #{id}
+
+  </select>
+    <!-- dealPage End-->
+
+
+    <select id="getSalaryList" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+        mu.nickname,
+        mt.task_name,
+        mpq.NAME,
+        mbt.*,
+        mpq.price
+        FROM
+        (select * from mes_budget_taskwork where 1=1 <if test="taskmanId != 'admin'.toString()">and taskman_id =
+        #{taskmanId}</if>) mbt left join mes_task mt on mbt.task_id = mt.id left join
+        mes_process_quota mpq on mbt.PROCEDURE_ID = mpq.id
+        left join mes_users mu
+        on mu.username = mbt.taskman_id
+        where 1=1
+        <if test="beginTime != null and beginTime != ''">
+            and to_date(mbt.report_time,'yyyy-mm-dd') &gt;= to_date(#{beginTime},'yyyy-mm-dd')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and to_date(mbt.report_time,'yyyy-mm-dd') &lt;= to_date(#{endTime},'yyyy-mm-dd')
+        </if>
+        order by to_date(mbt.report_time,'YYYY-MM-DD') desc,NLSSORT( mu.nickname,'NLS_SORT = SCHINESE_PINYIN_M')
+    </select>
+    <select id="getTaskSend" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+         SELECT
+            mt.id,
+            mt.task_name,
+            mt.total_num
+          FROM
+            mes_task mt where   mt.task_status = 'TASK_ING'
+  </select>
+
+    <select id="getDonePercent" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+	round( sum( done_num ) / sum( task_num ) * 100, 2 ) || '%' done_percent
+        FROM
+            (
+        SELECT
+            mbt.PROCEDURE_ID,
+            md.NAME groupName,
+            mbt.win_no,
+            mpq.NAME,
+            mbt.task_num,
+            mbt.done_num,
+            ( mbt.task_num - mbt.done_num ) left_num,
+            mpo.bigin_date,
+            mpo.end_date
+        FROM
+            (
+        SELECT
+            mbt1.process_group,
+            mbt1.PROCEDURE_ID,
+            mbt1.task_id,
+            mbt1.win_no,
+            mbt1.done_num,
+            ( mtd.num * mbt1.task_num ) task_num
+        FROM
+            mes_task_detail mtd,
+            (
+        SELECT
+            n.task_id,
+            n.win_no,
+            n.task_num,
+            n.procedure_id,
+            n.process_group,
+            decode( m.done_num, '', 0, m.done_num ) done_num
+        FROM
+            (
+        SELECT
+            max( a.PROCESS_GROUP ) process_group,
+            max( a.PROCEDURE_ID ) PROCEDURE_ID,
+            max( a.task_id ) task_id,
+            max( a.win_no ) win_no,
+            max( mwmc.numbers ) task_num,
+            sum( a.done_num ) done_num
+        FROM
+            mes_budget_taskwork a
+            LEFT JOIN mes_win_model_craft mwmc ON mwmc.NAME = a.PROCEDURE_ID where a.task_id = #{taskId}
+        GROUP BY
+            PROCEDURE_ID
+            ) m
+            FULL OUTER JOIN (
+        SELECT
+            mtd.task_id,
+            mtd.win_no,
+            mtd.NUM done_num,
+            mwmc.numbers task_num,
+            mwmc.NAME PROCEDURE_ID,
+            mpq.TEAM_GROUP process_group
+        FROM
+            MES_TASK_DETAIL mtd
+            LEFT JOIN mes_win_model mwm ON mtd.TASK_WIN_TYPE = mwm.
+            CODE LEFT JOIN MES_WIN_MODEL_CRAFT mwmc ON mwm.win_id = mwmc.win_model_id
+            AND MWMC.CODE = '4'
+            LEFT JOIN MES_PROCESS_QUOTA mpq ON mwmc.NAME = mpq.CODE
+        WHERE
+            task_id = #{taskId}
+            ) n ON m.PROCEDURE_ID = n.PROCEDURE_ID
+            ) mbt1
+        WHERE
+            mtd.win_no = mbt1.win_no
+            ) mbt
+            LEFT JOIN mes_task mt ON mbt.task_id = mt.id
+            LEFT JOIN MES_PROCESS_QUOTA mpq ON mpq.id = mbt.PROCEDURE_ID
+            LEFT JOIN MES_DICTIONARIES md ON md.dic_id = mbt.process_group
+            LEFT JOIN MES_PRODUCTION_ORDER mpo ON mt.id = mpo.task_code
+            AND mpo.del = '0'
+        WHERE
+            task_id = #{taskId}
+        ORDER BY
+            mbt.win_no,
+            to_number ( md.dic_id )
+            )
+    </select>
+
+    <select id="getTaskSendDetail" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+      SELECT
+        mbt.PROCEDURE_ID,
+        md.NAME groupName,
+        mbt.win_no,
+        mpq.NAME,
+        mbt.task_num,
+        mbt.done_num,
+        ( mbt.task_num - mbt.done_num ) left_num,
+        mpo.bigin_date,
+        mpo.end_date
+    FROM
+        (
+    SELECT
+        mbt1.process_group,
+        mbt1.PROCEDURE_ID,
+        mbt1.task_id,
+        mbt1.win_no,
+        mbt1.done_num,
+        ( mtd.num * mbt1.task_num ) task_num
+    FROM
+        mes_task_detail mtd,
+        (
+    SELECT
+        n.task_id,
+        n.win_no,
+        n.task_num,
+        n.procedure_id,
+        n.process_group,
+        decode( m.done_num, '', 0, m.done_num ) done_num
+    FROM
+        (
+    SELECT
+        max( a.PROCESS_GROUP ) process_group,
+        max( a.PROCEDURE_ID ) PROCEDURE_ID,
+        max( a.task_id ) task_id,
+        max( a.win_no ) win_no,
+        max( mwmc.numbers ) task_num,
+        sum( a.done_num ) done_num
+    FROM
+        mes_budget_taskwork a
+        LEFT JOIN mes_win_model_craft mwmc ON mwmc.NAME = a.PROCEDURE_ID where a.task_id = #{taskId}
+    GROUP BY
+        PROCEDURE_ID
+        ) m
+        FULL OUTER JOIN (
+    SELECT
+        mtd.task_id,
+        mtd.win_no,
+        mtd.NUM done_num,
+        mwmc.numbers task_num,
+        mwmc.NAME PROCEDURE_ID,
+        mpq.TEAM_GROUP process_group
+    FROM
+        MES_TASK_DETAIL mtd
+        LEFT JOIN mes_win_model mwm ON mtd.TASK_WIN_TYPE = mwm.
+        CODE LEFT JOIN MES_WIN_MODEL_CRAFT mwmc ON mwm.win_id = mwmc.win_model_id
+        AND MWMC.CODE = '4'
+        LEFT JOIN MES_PROCESS_QUOTA mpq ON mwmc.NAME = mpq.CODE
+    WHERE
+        task_id = #{taskId}
+        ) n ON m.PROCEDURE_ID = n.PROCEDURE_ID
+        ) mbt1
+    WHERE
+        mtd.win_no = mbt1.win_no
+        ) mbt
+        LEFT JOIN mes_task mt ON mbt.task_id = mt.id
+        LEFT JOIN MES_PROCESS_QUOTA mpq ON mpq.id = mbt.PROCEDURE_ID
+        LEFT JOIN MES_DICTIONARIES md ON md.dic_id = mbt.process_group
+      left join MES_PRODUCTION_ORDER mpo on mt.id= mpo.task_code and mpo.del = '0'
+    WHERE
+        task_id = #{taskId}
+    ORDER BY
+        mbt.win_no,to_number ( md.dic_id )
+  </select>
+
+    <select id="getTotalLeftNum" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+    select sum(done_num) done_num from MES_BUDGET_TASKWORK where task_id = #{taskId} and procedure_id = #{procedureId} and win_no = #{winNo}
+  </select>
+
+    <!--任务分发已完成工序-->
+    <select id="taskSendDoneModel" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select * from (
+        SELECT
+        a.process_group,
+        a.task_id,
+        a.win_no,
+        md.NAME,
+        mpq.NAME mpqName,
+        a.child,
+        mt.bigin_date,
+        mt.end_date
+        FROM
+        (
+        SELECT
+        max( task_id ) task_id,
+        win_no,
+        procedure_id,
+        process_group,
+        sum( done_num ) child
+        FROM
+        MES_BUDGET_TASKWORK
+        WHERE 1=1
+        <if test="taskId!=null and taskId!='null'">
+            and task_id = #{taskId}
+        </if>
+        <if test="procedureId!=null and procedureId!=''">
+            and procedure_id = #{procedureId}
+        </if>
+        <if test="winNo!=null and winNo!=''">
+            and win_no = #{winNo}
+        </if>
+        GROUP BY
+        procedure_id,
+        process_group,
+        win_no
+        ) a
+        LEFT JOIN mes_task mt ON mt.id = a.task_id
+        AND mt.del = '0'
+        LEFT JOIN MES_DICTIONARIES md ON a.process_group = md.dic_id
+        LEFT JOIN MES_PROCESS_QUOTA mpq ON a.procedure_id = mpq.id)
+        where 1=1
+        <if test="userProcessGroup!=null and userProcessGroup!='null'">
+            and process_group = #{userProcessGroup}
+        </if>
+    </select>
+    <!--任务分发全部工序-->
+    <select id="taskSendAllModel" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select * from (
+        SELECT
+        a.process_group,
+        a.task_id,
+        a.win_no,
+        md.NAME,
+        mpq.NAME mpqName,
+        a.mother,
+        mt.bigin_date,
+        mt.end_date,
+        a.PROCEDURE_ID
+        FROM
+        (
+        SELECT
+        task_id,
+        win_no,
+        process_group,
+        PROCEDURE_ID,
+        num * numbers mother
+        FROM
+        (
+        SELECT
+        mtd.task_id,
+        mtd.win_no,
+        mtd.NUM,
+        mwmc.numbers,
+        mwmc.NAME PROCEDURE_ID,
+        mpq.TEAM_GROUP process_group,
+        (mtd.NUM*mwmc.numbers) mother
+        FROM
+        MES_TASK_DETAIL mtd LEFT JOIN mes_win_model mwm ON mtd.TASK_WIN_TYPE = mwm.CODE and mwm.del='0' LEFT JOIN
+        MES_WIN_MODEL_CRAFT mwmc ON mwm.win_id = mwmc.win_model_id and mwmc.del = '0'
+        AND MWMC.CODE = '4' LEFT JOIN MES_PROCESS_QUOTA mpq ON mwmc.NAME = mpq.CODE
+        WHERE
+        task_id = #{taskId}
+        )) a left join mes_task mt on mt.id = a.task_id and mt.del='0' left join MES_DICTIONARIES md on a.process_group
+        = md.dic_id left join MES_PROCESS_QUOTA mpq on a.procedure_id = mpq.id
+        order by a.win_no,to_number(md.dic_id))
+        where 1=1
+        <if test="userProcessGroup!=null and userProcessGroup!='null'">
+            and process_group = #{userProcessGroup}
+        </if>
+    </select>
+
+    <!-- 任务分发分子 -->
+    <select id="taskSendChild" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select sum(done_num) child from MES_BUDGET_TASKWORK
+        WHERE
+            task_id = #{taskId}
+    </select>
+
+    <!-- 任务分发分母 -->
+    <select id="taskSendMother" parameterType="java.lang.String" resultType="com.jh.entity.MesBudgetTaskwork">
+        select sum(mother) mother from (
+          SELECT
+            mtd.task_id,
+            mtd.win_no,
+            mtd.NUM done_num,
+            mwmc.numbers task_num,
+            mwmc.NAME PROCEDURE_ID,
+            mpq.TEAM_GROUP process_group,
+	        (mtd.NUM*mwmc.numbers) mother
+          FROM
+            MES_TASK_DETAIL mtd
+            LEFT JOIN mes_win_model mwm ON mtd.TASK_WIN_TYPE = mwm.CODE and mwm.del='0'
+            LEFT JOIN MES_WIN_MODEL_CRAFT mwmc ON mwm.win_id = mwmc.win_model_id AND MWMC.CODE = '4' and mwmc.del='0'
+            LEFT JOIN MES_PROCESS_QUOTA mpq ON mwmc.NAME = mpq.CODE
+          WHERE
+            task_id = #{taskId})
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from MES_BUDGET_TASKWORK
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_BUDGET_TASKWORK
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insertSelective" parameterType="com.jh.entity.MesBudgetTaskwork">
+        insert into MES_BUDGET_TASKWORK
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="milestoneClass != null">
+                MILESTONE_CLASS,
+            </if>
+            <if test="projectId != null">
+                PROJECT_ID,
+            </if>
+            <if test="processLevel != null">
+                PROCESS_LEVEL,
+            </if>
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="taskId != null">
+                TASK_ID,
+            </if>
+            <if test="procedureId != null">
+                PROCEDURE_ID,
+            </if>
+            <if test="taskmanId != null">
+                TASKMAN_ID,
+            </if>
+            <if test="doneNum != null">
+                DONE_NUM,
+            </if>
+            <if test="reportTime != null">
+                REPORT_TIME,
+            </if>
+            <if test="checker != null">
+                CHECKER,
+            </if>
+            <if test="checkStatus != null">
+                CHECK_STATUS,
+            </if>
+            <if test="winNo != null">
+                WIN_NO,
+            </if>
+            <if test="processGroup != null">
+                PROCESS_GROUP,
+            </if>
+            <if test="taskNum != null">
+                TASK_NUM,
+            </if>
+            <if test="reason != null">
+                REASON,
+            </if>
+            <if test="milestone != null">
+                MILESTONE,
+            </if>
+            <if test="taskWinType != null">
+                TASK_WIN_TYPE,
+            </if>
+            <if test="taskWinTypeName != null">
+                TASK_WIN_TYPE_NAME,
+            </if>
+            <if test="totalNum != null">
+                TOTAL_NUM,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="milestoneClass != null">
+                #{milestoneClass,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="processLevel != null">
+                #{processLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="taskId != null">
+                #{taskId,jdbcType=VARCHAR},
+            </if>
+            <if test="procedureId != null">
+                #{procedureId,jdbcType=VARCHAR},
+            </if>
+            <if test="taskmanId != null">
+                #{taskmanId,jdbcType=VARCHAR},
+            </if>
+            <if test="doneNum != null">
+                #{doneNum,jdbcType=VARCHAR},
+            </if>
+            <if test="reportTime != null">
+                #{reportTime,jdbcType=VARCHAR},
+            </if>
+            <if test="checker != null">
+                #{checker,jdbcType=VARCHAR},
+            </if>
+            <if test="checkStatus != null">
+                #{checkStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="winNo != null">
+                #{winNo,jdbcType=VARCHAR},
+            </if>
+            <if test="processGroup != null">
+                #{processGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="taskNum != null">
+                #{taskNum,jdbcType=VARCHAR},
+            </if>
+            <if test="reason != null">
+                #{reason,jdbcType=VARCHAR},
+            </if>
+            <if test="milestone != null">
+                #{milestone,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinType != null">
+                #{taskWinType,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinTypeName != null">
+                #{taskWinTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                #{totalNum,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesBudgetTaskwork">
+        update MES_BUDGET_TASKWORK
+        <set>
+            <if test="milestoneClass != null">
+                MILESTONE_CLASS = #{milestoneClass,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="processLevel != null">
+                PROCESS_LEVEL = #{processLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="taskId != null">
+                TASK_ID = #{taskId,jdbcType=VARCHAR},
+            </if>
+            <if test="procedureId != null">
+                PROCEDURE_ID = #{procedureId,jdbcType=VARCHAR},
+            </if>
+            <if test="taskmanId != null">
+                TASKMAN_ID = #{taskmanId,jdbcType=VARCHAR},
+            </if>
+            <if test="doneNum != null">
+                DONE_NUM = #{doneNum,jdbcType=VARCHAR},
+            </if>
+            <if test="reportTime != null">
+                REPORT_TIME = #{reportTime,jdbcType=VARCHAR},
+            </if>
+            <if test="checker != null">
+                CHECKER = #{checker,jdbcType=VARCHAR},
+            </if>
+            <if test="checkStatus != null">
+                CHECK_STATUS = #{checkStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="winNo != null">
+                WIN_NO = #{winNo,jdbcType=VARCHAR},
+            </if>
+            <if test="processGroup != null">
+                PROCESS_GROUP = #{processGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="taskNum != null">
+                TASK_NUM = #{taskNum,jdbcType=VARCHAR},
+            </if>
+            <if test="reason != null">
+                REASON = #{reason,jdbcType=VARCHAR},
+            </if>
+            <if test="milestone != null">
+                MILESTONE = #{milestone,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinType != null">
+                TASK_WIN_TYPE = #{taskWinType,jdbcType=VARCHAR},
+            </if>
+            <if test="taskWinTypeName != null">
+                TASK_WIN_TYPE_NAME = #{taskWinTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                TOTAL_NUM = #{totalNum,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+    <select id="find" resultType="com.jh.entity.MesBudgetTaskwork">
+      SELECT
+          MES_BUDGET_TASKWORK.DONE_NUM AS "doneNum",
+          MES_PROCESS_QUOTA.PRICE AS "price"
+       from
+           MES_BUDGET_TASKWORK ,MES_PROCESS_QUOTA
+       where
+          MES_BUDGET_TASKWORK.PROCEDURE_ID=MES_PROCESS_QUOTA.ID
+          AND
+          MES_BUDGET_TASKWORK.TASKMAN_ID=#{taskmanId}
+          AND
+          MES_BUDGET_TASKWORK.REPORT_TIME like #{reportTime}||'%'
+
+  </select>
+
+
+    <select id="findAll" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+        *
+        from
+        MES_BUDGET_TASKWORK
+        where 1=1
+        <if test="procedureId != null">
+            PROCEDURE_ID = #{procedureId,jdbcType=VARCHAR},
+        </if>
+
+    </select>
+
+
+    <select id="query" resultType="com.jh.entity.MesBudgetTaskwork">
+ 	SELECT
+		MES_DICTIONARIES.DIC_ID AS "dicId",
+		sum( to_number ( 	MES_BUDGET_TASKWORK.DONE_NUM) ) AS "sumCount"
+	FROM
+		MES_BUDGET_TASKWORK
+	LEFT JOIN MES_DICTIONARIES ON MES_BUDGET_TASKWORK.PROCESS_LEVEL = MES_DICTIONARIES.DIC_ID
+	where
+		  MES_BUDGET_TASKWORK.WIN_NO = #{winNo}
+		  and MES_BUDGET_TASKWORK.MILESTONE='1'
+	GROUP BY
+		MES_DICTIONARIES.DIC_ID
+  </select>
+
+
+    <select id="queryList" resultType="com.jh.entity.MesBudgetTaskwork">
+ 	SELECT
+		*
+	FROM
+		MES_BUDGET_TASKWORK
+	where
+		  WIN_NO = #{winNo}
+		  and MES_BUDGET_TASKWORK.MILESTONE='1'
+  </select>
+
+
+    <select id="all" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+        MES_BUDGET_TASKWORK.TASK_ID AS "taskId",
+        MES_BUDGET_TASKWORK.WIN_NO AS "winNo",
+        MES_PROCESS_QUOTA.NAME "name",
+        MES_WIN_MODEL_CRAFT.NUMBERS "numbers",
+        MES_TASK.TASK_NAME AS "taskName",
+        MES_TASK_DETAIL.NUM "num",
+        sum( to_number ( MES_BUDGET_TASKWORK.DONE_NUM ) ) AS "sumCount"
+        FROM
+        MES_BUDGET_TASKWORK
+        LEFT JOIN MES_PROCESS_QUOTA ON MES_BUDGET_TASKWORK.PROCEDURE_ID = MES_PROCESS_QUOTA.ID
+        LEFT JOIN MES_WIN_MODEL_CRAFT ON MES_WIN_MODEL_CRAFT.NAME = MES_BUDGET_TASKWORK.PROCEDURE_ID
+        LEFT JOIN MES_TASK ON MES_TASK.ID = MES_BUDGET_TASKWORK.TASK_ID
+        LEFT JOIN MES_TASK_DETAIL ON MES_TASK_DETAIL.WIN_NO = MES_BUDGET_TASKWORK.WIN_NO
+        WHERE 1=1
+        <if test="taskId != null and  taskId != ''">
+            AND MES_BUDGET_TASKWORK.TASK_ID =#{taskId}
+        </if>
+        <if test="beginDate != null  and  beginDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &gt;= to_date ( #{beginDate}, 'yyyy-mm-dd' )
+        </if>
+        <if test="endDate != null  and  endDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &lt;= to_date ( #{endDate}, 'yyyy-mm-dd' )
+        </if>
+        GROUP BY
+        MES_BUDGET_TASKWORK.TASK_ID,
+        MES_BUDGET_TASKWORK.WIN_NO,
+        MES_PROCESS_QUOTA.NAME,
+        MES_WIN_MODEL_CRAFT.NUMBERS,
+        MES_TASK.TASK_NAME,
+        MES_TASK_DETAIL.NUM
+        ORDER BY
+        MES_BUDGET_TASKWORK.WIN_NO ASC
+    </select>
+
+
+    <select id="selAll" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+            MES_BUDGET_TASKWORK.MILESTONE_CLASS AS "milestoneClass",
+            MES_BUDGET_TASKWORK.TASK_WIN_TYPE as "taskWinType",
+            MES_BUDGET_TASKWORK.PROCEDURE_ID "procedureId",
+            MES_BUDGET_TASKWORK.PROCESS_LEVEL AS "processLevel",
+            MES_BUDGET_TASKWORK.WIN_NO AS "winNo",
+            MES_DICTIONARIES.NAME AS "taskName",
+            MES_PROJECT.PROJECT_NAME AS "projectName",
+            MES_PROJECT.PROJECT_ID AS "projectId",
+            COALESCE ( SUM( to_number ( MES_BUDGET_TASKWORK.DONE_NUM ) ), 0 ) AS "num"
+        FROM
+        MES_BUDGET_TASKWORK
+        LEFT JOIN MES_DICTIONARIES on MES_BUDGET_TASKWORK.PROCESS_LEVEL=MES_DICTIONARIES.DIC_ID
+        LEFT JOIN MES_TASK on MES_TASK.ID=MES_BUDGET_TASKWORK.TASK_ID
+        LEFT join MES_PROJECT on MES_TASK.PROJECT_ID=MES_PROJECT.PROJECT_ID
+        WHERE
+        MES_BUDGET_TASKWORK.MILESTONE = '1'
+        AND MES_BUDGET_TASKWORK.PROJECT_ID =#{projectId}
+        <if test="buildingNo != null  and  buildingNo != ''">
+            AND MES_TASK.BUILDING_NO=#{buildingNo}
+        </if>
+        <if test="beginDate != null  and  beginDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &gt;= to_date ( #{beginDate}, 'yyyy-mm-dd' )
+        </if>
+        <if test="endDate != null  and  endDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &lt;= to_date ( #{endDate}, 'yyyy-mm-dd' )
+        </if>
+        GROUP BY
+        MES_BUDGET_TASKWORK.TASK_WIN_TYPE,
+        MES_BUDGET_TASKWORK.PROCEDURE_ID,
+        MES_BUDGET_TASKWORK.MILESTONE_CLASS,
+        MES_PROJECT.PROJECT_NAME,
+        MES_PROJECT.PROJECT_ID,
+        MES_BUDGET_TASKWORK.PROCESS_LEVEL,
+        MES_BUDGET_TASKWORK.WIN_NO,
+        MES_DICTIONARIES.NAME
+        order by MES_BUDGET_TASKWORK.WIN_NO desc
+    </select>
+
+
+    <select id="findList" resultType="com.jh.entity.MesBudgetTaskwork">
+      SELECT
+            MES_PROJECT.PROJECT_NAME AS "projectName",
+            MES_TASK.ID as "taskId",
+            MES_TASK.TASK_NAME as "taskName",
+            MES_BUDGET_TASKWORK.PROCESS_LEVEL as "processLevel",
+            MES_BUDGET_TASKWORK.MILESTONE_CLASS as "milestoneClass",
+            MES_BUDGET_TASKWORK.PROJECT_ID as "projectId",
+            dic.NAME as "taskWinTypeName",
+            MES_DICTIONARIES.NAME as "processGroupName"
+        FROM
+            MES_BUDGET_TASKWORK
+            LEFT JOIN MES_TASK ON MES_BUDGET_TASKWORK.TASK_ID = MES_TASK.ID
+	        LEFT JOIN MES_PROJECT ON MES_TASK.PROJECT_ID = MES_PROJECT.PROJECT_ID
+            LEFT join MES_DICTIONARIES on MES_BUDGET_TASKWORK.PROCESS_LEVEL=MES_DICTIONARIES.DIC_ID
+            LEFT join MES_DICTIONARIES dic on MES_TASK.WIN_TYPE=dic.DIC_ID
+        WHERE
+            MES_BUDGET_TASKWORK.MILESTONE = '1'
+            and MES_TASK.DEL='0'
+	    AND MES_BUDGET_TASKWORK.REPORT_TIME LIKE #{reportTime}||'%'
+        GROUP BY
+        	MES_PROJECT.PROJECT_NAME,
+            MES_TASK.ID,
+            MES_TASK.TASK_NAME,
+            MES_BUDGET_TASKWORK.PROCESS_LEVEL,
+            MES_BUDGET_TASKWORK.MILESTONE_CLASS,
+            MES_BUDGET_TASKWORK.PROJECT_ID,
+            MES_DICTIONARIES.NAME,
+            dic.NAME
+            ORDER BY MES_TASK.ID
+  </select>
+
+    <select id="findCountList" resultType="com.jh.entity.MesBudgetTaskwork">
+         SELECT
+            MES_TASK.ID "taskId",
+            MES_TASK.TASK_NAME as "taskName",
+            MES_BUDGET_TASKWORK.PROJECT_ID as "projectId",
+            MES_BUDGET_TASKWORK.PROCESS_LEVEL as "processLevel",
+            MES_BUDGET_TASKWORK.WIN_NO as "winNo",
+            MES_BUDGET_TASKWORK.MILESTONE_CLASS as "milestoneClass",
+            MES_BUDGET_TASKWORK.TASK_WIN_TYPE as "taskWinType",
+            MES_BUDGET_TASKWORK.PROCEDURE_ID as "procedureId",
+            COALESCE ( sum( to_number ( MES_BUDGET_TASKWORK.DONE_NUM ) ), 0 ) as "num"
+        FROM
+            MES_BUDGET_TASKWORK
+            LEFT JOIN MES_TASK ON MES_BUDGET_TASKWORK.TASK_ID = MES_TASK.ID
+        WHERE
+            MES_BUDGET_TASKWORK.MILESTONE = '1'
+            AND MES_TASK.DEL = '0'
+            AND MES_BUDGET_TASKWORK.REPORT_TIME LIKE #{reportTime}||'%'
+        GROUP BY
+            MES_TASK.ID,
+            MES_TASK.TASK_NAME,
+            MES_BUDGET_TASKWORK.PROJECT_ID,
+            MES_BUDGET_TASKWORK.PROCESS_LEVEL,
+            MES_BUDGET_TASKWORK.MILESTONE_CLASS,
+            MES_BUDGET_TASKWORK.TASK_WIN_TYPE,
+               MES_BUDGET_TASKWORK.PROCEDURE_ID,
+            MES_BUDGET_TASKWORK.WIN_NO
+  </select>
+
+
+    <select id="selFind" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT COALESCE
+            ( SUM( to_number ( DONE_NUM ) ), 0 ) AS "doneNum" ,
+            TASK_WIN_TYPE as "taskWinType",
+            PROCEDURE_ID as "procedureId",
+            PROCESS_LEVEL as "processLevel"
+        FROM
+            MES_BUDGET_TASKWORK
+        WHERE
+            WIN_NO = #{winNo}
+            AND PROJECT_ID =  #{projectId}
+            AND MILESTONE = #{milestone}
+            AND MILESTONE_CLASS =  #{milestoneClass}
+        GROUP BY
+            WIN_NO,
+            PROCEDURE_ID,
+            TASK_WIN_TYPE,
+            PROCESS_LEVEL
+    </select>
+
+
+
+
+
+
+
+
+
+    <select id="selAllCount" resultType="com.jh.entity.MesBudgetTaskwork">
+        SELECT
+        MES_PROJECT.PROJECT_NAME as "projectName" ,
+        MES_PROJECT.PROJECT_ID as "projectId" ,
+        MES_DICTIONARIES.NAME as "groupName",
+        MES_BUDGET_TASKWORK.WIN_NO as "winNo",
+        MES_BUDGET_TASKWORK.TASK_WIN_TYPE "taskWinType",
+        MES_BUDGET_TASKWORK.MILESTONE_CLASS as "milestoneClass",
+        MES_BUDGET_TASKWORK.PROCESS_LEVEL "processLevel",
+        MES_BUDGET_TASKWORK.PROCEDURE_ID "procedureId",
+        COALESCE ( SUM( to_number ( MES_BUDGET_TASKWORK.DONE_NUM ) ), 0 ) as "doneNum" ,
+        (
+        SELECT
+        MES_WIN_MODEL_CRAFT.NUMBERS
+        FROM
+        MES_WIN_MODEL_CRAFT
+        LEFT JOIN MES_WIN_MODEL ON  MES_WIN_MODEL.WIN_ID=MES_WIN_MODEL_CRAFT.WIN_MODEL_ID
+        WHERE
+        MES_WIN_MODEL_CRAFT.DEL = '0'
+        AND MES_WIN_MODEL.DEL = '0'
+        AND MES_WIN_MODEL_CRAFT.CODE = '2'
+        AND MES_WIN_MODEL.CODE=MES_BUDGET_TASKWORK.TASK_WIN_TYPE
+        AND MES_WIN_MODEL_CRAFT.NAME=MES_BUDGET_TASKWORK.PROCESS_LEVEL
+        ) as "totalNum",
+        (
+        SELECT
+        MES_WIN_MODEL_CRAFT.NUMBERS
+        FROM
+        MES_WIN_MODEL_CRAFT
+        LEFT JOIN MES_WIN_MODEL ON  MES_WIN_MODEL.WIN_ID=MES_WIN_MODEL_CRAFT.WIN_MODEL_ID
+        WHERE
+        MES_WIN_MODEL_CRAFT.DEL = '0'
+        AND MES_WIN_MODEL.DEL = '0'
+        AND MES_WIN_MODEL.CODE=MES_BUDGET_TASKWORK.TASK_WIN_TYPE
+        AND MES_WIN_MODEL_CRAFT.NAME=MES_BUDGET_TASKWORK.PROCEDURE_ID
+        ) as "leftNum"
+        FROM
+        MES_BUDGET_TASKWORK
+        LEFT JOIN MES_DICTIONARIES ON MES_BUDGET_TASKWORK.PROCESS_LEVEL = MES_DICTIONARIES.DIC_ID
+        LEFT JOIN MES_PROJECT ON MES_BUDGET_TASKWORK.PROJECT_ID = MES_PROJECT.PROJECT_ID
+        WHERE
+        MES_BUDGET_TASKWORK.PROJECT_ID = #{projectId}
+        <if test="beginDate != null  and  beginDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &gt;= to_date ( #{beginDate}, 'yyyy-mm-dd' )
+        </if>
+        <if test="endDate != null  and  endDate != ''">
+            AND to_date ( MES_BUDGET_TASKWORK.REPORT_TIME, 'yyyy-mm-dd' ) &lt;= to_date ( #{endDate}, 'yyyy-mm-dd' )
+        </if>
+        AND MES_BUDGET_TASKWORK.MILESTONE='1'
+        GROUP BY
+        MES_DICTIONARIES.NAME,
+        MES_PROJECT.PROJECT_NAME,
+        MES_BUDGET_TASKWORK.WIN_NO,
+        MES_BUDGET_TASKWORK.TASK_WIN_TYPE,
+        MES_BUDGET_TASKWORK.MILESTONE_CLASS,
+        MES_BUDGET_TASKWORK.PROCESS_LEVEL,
+        MES_BUDGET_TASKWORK.PROCEDURE_ID,
+        MES_PROJECT.PROJECT_ID
+        ORDER BY
+        MES_BUDGET_TASKWORK.WIN_NO
+    </select>
+
+
+
+
+
+
+
+
+
+
+</mapper>

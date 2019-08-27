@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/css/font.css" />
+    <link rel="stylesheet" href="/css/xadmin.css" />
+    <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/ajax-util.js"></script>
+    <script type="text/javascript" src="/js/cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <style>
+        .layui-form-item .layui-input-inline{
+            width:360px;
+        }
+        .layui-form-label{
+            width:120px;
+        }
+        body{
+            background:url(/images/bg.png) no-repeat center;
+            background-size:cover
+        }
+    </style>
+</head>
+
+<body>
+<div class="x-body">
+    <form id="form" class="layui-form layui-col-space5">
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <span class="x-red">*</span>员工编号：
+            </label>
+            <div class="layui-input-inline">
+                <input id="taskmanId"   readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.username}">
+            </div>
+            <label class="layui-form-label">
+                <span class="x-red">*</span>员工姓名：
+            </label>
+            <div class="layui-input-inline">
+                <input readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.nickname}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <span class="x-red">*</span>作业单名称：
+            </label>
+            <div class="layui-input-inline">
+                <input readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.taskName}">
+            </div>
+            <label class="layui-form-label">
+                <span class="x-red">*</span>作业单编号：
+            </label>
+            <div class="layui-input-inline">
+                <input id="taskId" readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.taskId}">
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <span class="x-red">*</span>窗号：
+            </label>
+            <div class="layui-input-inline">
+                <input id="winNo" readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.winNo}">
+            </div>
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>窗型：
+            </label>
+            <div class="layui-input-inline">
+                <input id="winName" readonly class="layui-input test-item" th:value="${mesBudgetTaskwork.taskWinTypeName}" th:name="${mesBudgetTaskwork.taskWinType}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>工序组：
+            </label>
+            <div class="layui-input-inline">
+                <input id="processGroup" readonly class="layui-input test-item" th:name="${mesBudgetTaskwork.processGroup}" th:value="${mesBudgetTaskwork.name}">
+            </div>
+            <label class="layui-form-label">
+                <span class="x-red">*</span>工序：
+            </label>
+            <div class="layui-input-inline">
+                <input id="procedureId" readonly class="layui-input test-item" th:name="${mesBudgetTaskwork.procedureId}" th:value="${mesBudgetTaskwork.mpqName}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>总需求量：
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" readonly  id="totalNum" class="layui-input" autocomplete="off" th:value="${mesBudgetTaskwork.taskNum}*${mesBudgetTaskwork.totalNum}">
+            </div>
+            <label  class="layui-form-label">
+                剩余总需求量：
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" readonly  id="leftTotalNum"  class="layui-input" autocomplete="off" >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>原因：
+            </label>
+            <div class="layui-input-inline">
+                <select name="reason" id="reason">
+                    <option value="">请选择</option>
+                    <option th:text="${reason.name}" th:value="${reason.name}" th:each="reason:${reasonList}">待确认</option>
+                </select>
+            </div>
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>完工数量：
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" placeholder="请输入完工数量" required lay-verify="required" id="doneNum" name="doneNum" class="layui-input" autocomplete="off">
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <label  class="layui-form-label">
+                <span class="x-red">*</span>日期：
+            </label>
+            <div class="layui-input-inline">
+                <input id="reportTime" name="reportTime"  placeholder="请输入下发时间" class="layui-input test-item" autocomplete="off">
+            </div>
+        </div>
+        <div style="display: none;">
+            <input id="milestoneClass" name="milestoneClass" th:value="${mesBudgetTaskwork.milestoneClass}"/>
+            <input id="processLevel" name="processLevel" th:value="${mesBudgetTaskwork.processLevel}"/>
+            <input id="projectId" name="projectId" th:value="${mesBudgetTaskwork.projectId}"/>
+            <input id="milestone" name="milestone" th:value="${mesBudgetTaskwork.milestone}"/>
+            <input id="taskNum" name="milestone" th:value="${mesBudgetTaskwork.taskNum}"/>
+            <input id="totalNum1" name="milestone" th:value="${mesBudgetTaskwork.totalNum}"/>
+        </div>
+        <div>
+            <label class="layui-form-label">
+            </label>
+            <span  class="layui-btn"  onclick="add()">
+                提交
+            </span>
+        </div>
+    </form>
+<script>
+
+    $(function(){
+        $.ajax({
+            url:"/mesBudgetTaskwork/getNums?procedureId="+$("#procedureId").attr("name")+"&taskWinType="+$("#winName").attr("name")
+                +"&taskId="+$("#taskId").val()+"&winNo="+$("#winNo").val(),
+            success:function(data){
+                $("#leftTotalNum").val($("#totalNum").val()-data.leftTotalNum);
+            }
+        })
+    })
+
+    function today() {
+        var myDate = new Date();
+        var year = myDate.getFullYear(); //获取当前年
+        var mon = myDate.getMonth() + 1; //获取当前月
+        var date = myDate.getDate(); //获取当前日
+
+        var today = year + "-" + (parseInt(mon)>=10?mon:'0'+mon) + "-" + date;
+
+        return today;
+    }
+
+    layui.use(['form','laydate'], function() {
+        var laydate = layui.laydate;
+        var form = layui.form;
+
+        laydate.render({
+            elem: '#reportTime',
+            min: -1,
+            max:0,
+            value:today()
+        });
+
+
+    });
+
+    function add(){
+
+        var taskId = $.trim($("#taskId").val())
+        var taskmanId = $.trim($("#taskmanId").val())
+        var winNo = $.trim($("#winNo").val())
+        var processGroup = $.trim($("#processGroup").attr("name"))
+        var procedureId = $.trim($("#procedureId").attr("name"))
+        var totalNum = $("#totalNum1").val()
+        var taskNum = $.trim($("#taskNum").val())
+        var doneNum = $.trim($("#doneNum").val())
+        var reportTime = $.trim($("#reportTime").val())
+        var reason = $.trim($("#reason").val())
+        var milestoneClass = $.trim($("#milestoneClass").val())
+        var processLevel = $("#processLevel").val()
+        var projectId = $.trim($("#projectId").val())
+        var milestone = $.trim($("#milestone").val())
+        var leftTotalNum = $.trim($("#leftTotalNum").val())
+        var taskWinType = $("#winName").attr("name")
+        var taskWinTypeName = $("#winName").val()
+
+        if(doneNum == ""){
+            layer.msg("完工数量不能为空", {icon: 7, time: 2000});
+            return;
+        }
+        if(reportTime == ""){
+            layer.msg("上报日期不能为空", {icon: 7, time: 2000});
+            return;
+        }
+        if(reason == ""){
+            layer.msg("原因不能为空", {icon: 7, time: 2000});
+            return;
+        }
+        if(parseInt(doneNum) > parseInt(leftTotalNum)){
+            layer.msg("完工数量不能超过剩余总需求量", {icon: 7, time: 2000});
+            return;
+        }
+
+        if($("#reason option:selected").text()=='报废'){
+            if($.trim(doneNum.substring(0,1)) != "-") {
+                layer.msg("报废时完工数量必须输入负值", {icon: 7, time: 2000});
+                return;
+            }
+        }
+
+        var reportNum =  parseInt(leftTotalNum) - parseInt($("#totalNum").val());
+        if(parseInt(doneNum) < reportNum){
+            layer.msg("完工数量不能超过已上报数量", {icon: 7, time: 2000});
+            return;
+        }
+
+        layer.confirm('确认要提交吗？',function() {
+            $.ajax({
+                url: '/mesBudgetTaskworkDeal/mesBudgetTaskworkAdd',
+                data: {
+                    'taskId':taskId,
+                    'taskmanId':taskmanId,
+                    'winNo':winNo,
+                    'processGroup':processGroup,
+                    'procedureId':procedureId,
+                    'taskWinType':taskWinType,
+                    'taskWinTypeName':taskWinTypeName,
+                    'taskNum':taskNum,
+                    'totalNum':totalNum,
+                    'doneNum':doneNum,
+                    'reportTime':reportTime,
+                    'reason':reason,
+                    'milestoneClass':milestoneClass,
+                    'processLevel':processLevel,
+                    'projectId':projectId,
+                    'milestone':milestone
+                },
+                success: function (res) {
+                    if (res.status) {
+                        window.parent.location.reload();
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        layer.msg(res.msg, {icon: 1, time: 1000});
+                    }else{
+                        layer.msg(res.msg, {icon: 1, time: 1000});
+                    }
+                }
+            })
+        });
+    }
+
+</script>
+</body>
+
+</html>

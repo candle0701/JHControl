@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>角色列表</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="stylesheet" href="/css/font.css"/>
+    <link rel="stylesheet" href="/css/xadmin.css"/>
+    <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/ajax-util.js"></script>
+    <script type="text/javascript" src="/js/cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="/pagination/jquery.pagination.js"></script>
+</head>
+
+<body>
+<div class="x-body">
+    <div class="layui-form layui-form-pane">
+        <div class="layui-form-item layui-form-text">
+            <input style="display:none;" id="id" th:value="${id}" />
+            <label class="layui-form-label">
+                菜单权限
+            </label>
+            <table class="layui-table layui-input-block">
+                <tbody>
+                <tr th:each="menu:${menuList}">
+                    <td style="width:15%;text-align: center;">
+                        <span th:text="${menu.menuName}"></span>
+                    </td>
+                    <td>
+                        <!--<div class="layui-input-block">-->
+                            <!--<input name="id[]" checked="checked" lay-skin="primary" type="checkbox" value="2"-->
+                                   <!--th:title="${childMenu.menuName}" th:each="childMenu:${menu.childMesMenus}">-->
+                        <!--</div>-->
+                        <div>
+                            <div th:if="${childMenu.mrmStatus=='1'}" th:id="${childMenu.mrmId}" name="menuId"
+                                 class="layui-unselect layui-form-checkbox layui-form-checked"
+                                 th:each="childMenu:${menu.childMesMenus}"
+                                 th:value="${childMenu.mrmStatus}">
+                                <span th:text="${childMenu.menuName}">添加</span>
+                                <i class="layui-icon layui-icon-ok"></i>
+                            </div>
+                            <div th:if="${childMenu.mrmStatus=='0'}" th:id="${childMenu.mrmId}" name="menuId"
+                                 class="layui-unselect layui-form-checkbox"
+                                 th:each="childMenu:${menu.childMesMenus}"
+                                 th:value="${childMenu.mrmStatus}">
+                                <span th:text="${childMenu.menuName}">添加</span>
+                                <i class="layui-icon layui-icon-ok"></i>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <label class="layui-form-label">
+                按钮权限
+            </label>
+            <table class="layui-table layui-input-block">
+                <tbody>
+                <tr th:each="menu:${menuList2}">
+                    <td style="width:15%;text-align: center;">
+                        <span th:text="${menu.menuName}"></span>
+                    </td>
+                    <td>
+                        <div>
+                            <div th:if="${button.status=='1'}" th:id="${button.mmbId}" name="buttonId"
+                                 class="layui-unselect layui-form-checkbox layui-form-checked"
+                                 th:each="button:${menu.buttonList}"
+                                 th:value="${button.status}">
+                                <span th:text="${button.buttonName}">添加</span>
+                                <i class="layui-icon layui-icon-ok"></i>
+                            </div>
+                            <div th:if="${button.status=='0'}" th:id="${button.mmbId}" name="buttonId"
+                                 class="layui-unselect layui-form-checkbox"
+                                 th:each="button:${menu.buttonList}"
+                                 th:value="${button.status}">
+                                <span th:text="${button.buttonName}">添加</span>
+                                <i class="layui-icon layui-icon-ok"></i>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn" onclick="add_role()">提交</button>
+        </div>
+    </div>
+    <script>
+
+        $(function () {
+            $("div[name='buttonId']").click(function () {
+                if ($(this).attr("value") == 1) {
+                    $(this).attr("class", "layui-unselect layui-form-checkbox")
+                    $(this).attr("value", "0")
+                } else {
+                    $(this).attr("class", "layui-unselect layui-form-checkbox layui-form-checked")
+                    $(this).attr("value", "1")
+                }
+            });
+            $("div[name='menuId']").click(function () {
+                if ($(this).attr("value") == 1) {
+                    $(this).attr("class", "layui-unselect layui-form-checkbox")
+                    $(this).attr("value", "0")
+                } else {
+                    $(this).attr("class", "layui-unselect layui-form-checkbox layui-form-checked")
+                    $(this).attr("value", "1")
+                }
+            });
+        })
+
+        function add_role() {
+            layer.confirm('确认要提交吗？', function () {
+                $("div[name='menuId']").each(function (j, item) {
+                    var button_url = "/mesRole/submitPermissionMenu?id=" + $(this).attr('id') + "&status=" + $(this).attr("value") + "&roleId="+$("#id").val()
+                    $.ajax({
+                        url: button_url,
+                        type: 'POST',
+                        async: true,
+                        beforeSend: function () {
+                            return layer.msg('拼命执行中...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto', time:100000});
+                        },
+                        success: function (res) {
+                            if (res.status) {
+                                window.parent.location.reload();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                                layer.msg(res.msg, {icon: 1, time: 1000});
+                            } else {
+                                layer.msg(res.msg, {icon: 1, time: 1000});
+                            }
+                        }
+                    })
+                });
+
+                $("div[name='buttonId']").each(function (j, item) {
+                    var button_url = "/mesRole/submitPermissionButton?id=" + $(this).attr('id') + "&status=" + $(this).attr("value")
+                    $.ajax({
+                        url: button_url,
+                        type: 'POST',
+                        async: true,
+                        beforeSend: function () {
+                            return layer.msg('拼命执行中...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto', time:100000});
+                        },
+                        success: function (res) {
+                            if (res.status) {
+                                window.parent.location.reload();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                                layer.msg(res.msg, {icon: 1, time: 1000});
+                            } else {
+                                layer.msg(res.msg, {icon: 1, time: 1000});
+                            }
+                        }
+                    })
+                });
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>
