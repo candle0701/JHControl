@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesRoleUsersMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesRoleUsers">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="USERS_ID" jdbcType="VARCHAR" property="usersId" />
+    <result column="ROLE_ID" jdbcType="VARCHAR" property="roleId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, USERS_ID, ROLE_ID
+  </sql>
+  <select id="findRoleUsersIdById" resultType="com.jh.entity.MesRoleUsers">
+    SELECT
+    mes_role_users.id,mes_role_users.role_id,mes_role_users.users_id
+    FROM
+    mes_users
+    LEFT JOIN mes_role_users ON mes_role_users.id = mes_users.id
+    LEFT JOIN mes_role ON mes_role.id = mes_role_users.id
+    <if test="id != '0'.toString()">
+      WHERE mes_users.id=#{id}
+    </if>
+  </select>
+  <select id="findAllRoleUsers" resultType="com.jh.entity.MesRoleUsers">
+      select
+      <include refid="Base_Column_List" />
+      from mes_role_users
+  </select>
+  <select id="findRoleUsersByUsersId" resultType="com.jh.entity.MesRoleUsers">
+    select
+    <include refid="Base_Column_List" />
+    from mes_role_users where users_id = #{usersId}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MES_ROLE_USERS
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_ROLE_USERS
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByUsersId" parameterType="java.lang.String">
+    delete from MES_ROLE_USERS
+    where users_id = #{usersId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.jh.entity.MesRoleUsers">
+    insert into MES_ROLE_USERS (ID, USERS_ID, ROLE_ID
+      )
+    values (#{id,jdbcType=VARCHAR}, #{usersId,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.jh.entity.MesRoleUsers">
+    insert into MES_ROLE_USERS
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="usersId != null">
+        USERS_ID,
+      </if>
+      <if test="roleId != null">
+        ROLE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="usersId != null">
+        #{usersId,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesRoleUsers">
+    update MES_ROLE_USERS
+    <set>
+      <if test="usersId != null">
+        USERS_ID = #{usersId,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        ROLE_ID = #{roleId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByUserId" parameterType="com.jh.entity.MesRoleUsers">
+    update MES_ROLE_USERS
+    <set>
+      <if test="roleId != null">
+        ROLE_ID = #{roleId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where users_id = #{usersId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jh.entity.MesRoleUsers">
+    update MES_ROLE_USERS
+    set USERS_ID = #{usersId,jdbcType=VARCHAR},
+      ROLE_ID = #{roleId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

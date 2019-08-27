@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesDepartItemMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesDepartItem">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="DEPART_ID" jdbcType="VARCHAR" property="departId" />
+    <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+    <result column="POWER" jdbcType="VARCHAR" property="power" />
+    <result column="NOTE" jdbcType="VARCHAR" property="note" />
+    <result column="VALID" jdbcType="VARCHAR" property="valid" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, DEPART_ID, USER_ID, POWER, NOTE, VALID, REMARK
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MES_DEPART_ITEM
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByDepartId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from MES_DEPART_ITEM
+    where depart_id = #{departId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_DEPART_ITEM
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByUserId" parameterType="java.lang.String">
+    delete from MES_DEPART_ITEM
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.jh.entity.MesDepartItem">
+    insert into MES_DEPART_ITEM (ID, DEPART_ID, USER_ID, 
+      POWER, NOTE, VALID, 
+      REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{departId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{power,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{valid,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jh.entity.MesDepartItem">
+    insert into MES_DEPART_ITEM
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="departId != null">
+        DEPART_ID,
+      </if>
+      <if test="userId != null">
+        USER_ID,
+      </if>
+      <if test="power != null">
+        POWER,
+      </if>
+      <if test="note != null">
+        NOTE,
+      </if>
+      <if test="valid != null">
+        VALID,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="departId != null">
+        #{departId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="power != null">
+        #{power,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="valid != null">
+        #{valid,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesDepartItem">
+    update MES_DEPART_ITEM
+    <set>
+      <if test="departId != null">
+        DEPART_ID = #{departId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        USER_ID = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="power != null">
+        POWER = #{power,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="valid != null">
+        VALID = #{valid,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jh.entity.MesDepartItem">
+    update MES_DEPART_ITEM
+    set DEPART_ID = #{departId,jdbcType=VARCHAR},
+      USER_ID = #{userId,jdbcType=VARCHAR},
+      POWER = #{power,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR},
+      VALID = #{valid,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

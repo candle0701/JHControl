@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesWinModelCraftMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesWinModelCraft">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="PARENT_ID" jdbcType="VARCHAR" property="parentId" />
+    <result column="SORT" jdbcType="VARCHAR" property="sort" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+    <result column="UPDATE_BY" jdbcType="VARCHAR" property="updateBy" />
+    <result column="UPDATE_DATE" jdbcType="VARCHAR" property="updateDate" />
+    <result column="REMARKS" jdbcType="VARCHAR" property="remarks" />
+    <result column="DEL" jdbcType="VARCHAR" property="del" />
+    <result column="WIN_MODEL_ID" jdbcType="VARCHAR" property="winModelId" />
+    <result column="NUMBERS" jdbcType="VARCHAR" property="numbers" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="PERCENTAGE" jdbcType="VARCHAR" property="percentage" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    ID, NAME, PARENT_ID, SORT, CREATE_BY, CREATE_DATE,UPDATE_DATE,UPDATE_BY,REMARKS,DEL,WIN_MODEL_ID,NUMBERS,CODE,PERCENTAGE
+  </sql>
+
+  <select id="getNums" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    mwmc.ID, mwmc.NAME, mwmc.PARENT_ID, mwmc.SORT, mwmc.CREATE_BY, mwmc.CREATE_DATE,mwmc.UPDATE_DATE,mwmc.UPDATE_BY,mwmc.REMARKS,mwmc.DEL,mwmc.WIN_MODEL_ID,mwmc.NUMBERS,mwmc.CODE,mpq.milestone,mpq.status,mpq.milestone_class
+    from (select * from MES_WIN_MODEL_CRAFT where del = '0') mwmc
+    left join mes_process_quota mpq on mwmc.name = mpq.code
+    where mwmc.win_model_id=(select win_id FROM MES_WIN_MODEL where code=#{winName}  AND DEL = '0' )
+    and mwmc.name=#{name}
+  </select>
+
+
+   <select id="findList" resultType="com.jh.entity.MesWinModelCraft">
+    select
+    c.name AS "name",
+    c.PARENT_ID AS "parentId",
+    c.SORT AS "sort",
+    c.NUMBERS AS "numbers",
+    c.CODE AS "code",
+     c.PERCENTAGE AS "percentage",
+    m.win_dictionaries_id AS "dicId",
+    m.win_name AS "winName"
+    from    MES_WIN_MODEL_CRAFT c left  join  MES_WIN_MODEL m
+    on  c.WIN_MODEL_ID = m.win_id
+    where
+    m.del = 0
+    and c.del = 0
+    <if test="winModelId != null and winModelId != '' ">
+      and  c.WIN_MODEL_ID =#{winModelId}
+    </if>
+     <if test="parentId != null and parentId != '' ">
+       and  c.PARENT_ID =#{parentId}
+     </if>
+     <if test="code != null and code != '' ">
+       and  c.CODE =#{code}
+     </if>
+     order by c.CODE asc,c.SORT desc
+  </select>
+
+
+  <update id="update" parameterType="com.jh.entity.MesWinModelCraft">
+      update  MES_WIN_MODEL_CRAFT
+        <set>
+          <if test="sort!=null">SORT=#{sort},</if>
+          <if test="del!=null">DEL=#{del},</if>
+          <if test="name!=null">NAME=#{name},</if>
+          <if test="updateBy!=null">UPDATE_BY=#{updateBy},</if>
+          <if test="updateDate!=null">UPDATE_DATE=#{updateDate},</if>
+          <if test="numbers!=null">NUMBERS=#{numbers},</if>
+          <if test="code!=null">CODE=#{code},</if>
+          <if test="percentage!=null">PERCENTAGE=#{percentage},</if>
+
+        </set>
+     WHERE
+        1=1
+    <if test="winModelId != null and winModelId != '' ">
+      and     WIN_MODEL_ID = #{winModelId}
+    </if>
+    <if test="parentId != null and parentId != '' ">
+      and  PARENT_ID  = #{parentId}
+    </if>
+    <if test="id != null and id != '' ">
+      and  ID =#{id}
+    </if>
+
+  </update>
+
+
+
+  <insert id="insert" parameterType="com.jh.entity.MesWinModelCraft">
+    insert into MES_WIN_MODEL_CRAFT (ID, NAME, PARENT_ID,
+      SORT, CREATE_BY, CREATE_DATE,
+      UPDATE_BY, UPDATE_DATE, REMARKS,
+      DEL, WIN_MODEL_ID,NUMBERS,CODE,PERCENTAGE)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR},
+      #{sort,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR},
+      #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
+      #{del,jdbcType=VARCHAR}, #{winModelId,jdbcType=VARCHAR}, #{numbers,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}), #{percentage,jdbcType=VARCHAR}
+  </insert>
+
+
+
+  <insert id="insertSelective" parameterType="com.jh.entity.MesWinModelCraft">
+    insert into MES_WIN_MODEL_CRAFT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="name != null">
+        NAME,
+      </if>
+      <if test="parentId != null">
+        PARENT_ID,
+      </if>
+      <if test="sort != null">
+        SORT,
+      </if>
+      <if test="createBy != null">
+        CREATE_BY,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+      <if test="updateBy != null">
+        UPDATE_BY,
+      </if>
+      <if test="updateDate != null">
+        UPDATE_DATE,
+      </if>
+      <if test="remarks != null">
+        REMARKS,
+      </if>
+      <if test="del != null">
+        DEL,
+      </if>
+      <if test="winModelId != null">
+        WIN_MODEL_ID,
+      </if>
+      <if test="numbers != null">
+        NUMBERS,
+      </if>
+      <if test="code != null">
+        CODE,
+      </if>
+      <if test="percentage != null">
+        PERCENTAGE,
+      </if>
+    </trim>
+
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null">
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=VARCHAR},
+      </if>
+      <if test="winModelId != null">
+        #{winModelId,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null">
+        #{numbers,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="percentage != null">
+        #{percentage,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+
+  <select id="list" resultType="com.jh.entity.MesWinModelCraft">
+    select
+      ID AS "id",
+      NAME AS "name",
+      PARENT_ID AS "parentId",
+      SORT AS "sort",
+      CREATE_BY AS "createBy",
+      CREATE_DATE AS "createDate",
+      UPDATE_BY AS "updateBy",
+      UPDATE_DATE AS "updateDate",
+      REMARKS AS "remarks",
+      DEL AS "del",
+      WIN_MODEL_ID AS "winModelId",
+      NUMBERS AS "numbers",
+      CODE AS "code",
+    PERCENTAGE AS "percentage"
+
+      FROM
+         MES_WIN_MODEL_CRAFT
+    where
+      del = 0
+    <if test="winModelId != null ">
+      and  WIN_MODEL_ID =#{winModelId}
+    </if>
+    <if test="parentId != null ">
+      and  PARENT_ID =#{parentId}
+    </if>
+    <if test="code != null ">
+      and  CODE =#{code}
+    </if>
+    <if test="name != null ">
+      and  NAME =#{name}
+    </if>
+       order by to_number(SORT) asc
+  </select>
+
+  <select id="find" resultType="com.jh.entity.MesWinModelCraft">
+    select
+    ID AS "id",
+    NAME AS "name",
+    PARENT_ID AS "parentId",
+    SORT AS "sort",
+    CREATE_BY AS "createBy",
+    CREATE_DATE AS "createDate",
+    UPDATE_BY AS "updateBy",
+    UPDATE_DATE AS "updateDate",
+    REMARKS AS "remarks",
+    DEL AS "del",
+    WIN_MODEL_ID AS "winModelId",
+    NUMBERS AS "numbers",
+    CODE AS "code",
+       PERCENTAGE AS "percentage"
+    FROM
+    MES_WIN_MODEL_CRAFT
+    where
+        ID =#{id}
+
+  </select>
+
+
+
+  <select id="findAll" resultType="com.jh.entity.MesWinModelCraft">
+    select
+        *
+    from    MES_WIN_MODEL_CRAFT
+    where
+        del = 0
+    <if test="name != null  ">
+      and  NAME =#{name}
+    </if>
+    <if test="winModelId != null  ">
+      and  WIN_MODEL_ID =#{winModelId}
+    </if>
+    <if test="id != null ">
+      and  ID  !=#{id}
+    </if>
+    <if test="code != null and code != '' ">
+      and  CODE =#{code}
+    </if>
+    <if test="parentId != null ">
+      and  PARENT_ID =#{parentId}
+    </if>
+    order by to_number(code) asc,to_number(sort) asc
+  </select>
+
+
+
+  <select id="all" resultType="com.jh.entity.MesWinModelCraft">
+    SELECT
+      MES_WIN_MODEL_CRAFT.ID AS "id",
+       MES_PROCESS_QUOTA.NAME AS "name",
+       MES_PROCESS_QUOTA.CODE AS "code",
+       MES_DICTIONARIES.NAME AS "remarks"
+    FROM
+        MES_WIN_MODEL_CRAFT
+        LEFT JOIN MES_PROCESS_QUOTA ON MES_WIN_MODEL_CRAFT.NAME = MES_PROCESS_QUOTA.CODE
+        LEFT JOIN MES_DICTIONARIES on MES_PROCESS_QUOTA.STATUS=MES_DICTIONARIES.DIC_ID
+    WHERE
+        MES_WIN_MODEL_CRAFT.WIN_MODEL_ID = #{winModelId}
+        AND MES_WIN_MODEL_CRAFT.CODE =#{code}
+        AND MES_WIN_MODEL_CRAFT.DEL ='0'
+        AND MES_PROCESS_QUOTA.MILESTONE = '1'
+  </select>
+
+  <select id="sel" resultType="com.jh.entity.MesWinModelCraft">
+   SELECT
+	*
+  FROM
+      MES_WIN_MODEL_CRAFT
+      LEFT JOIN MES_WIN_MODEL ON MES_WIN_MODEL.WIN_ID = MES_WIN_MODEL_CRAFT.WIN_MODEL_ID
+  WHERE
+      MES_WIN_MODEL_CRAFT.DEL = '0'
+      and
+      MES_WIN_MODEL.CODE = #{code}
+  </select>
+
+  <delete id="del">
+    update
+        MES_WIN_MODEL_CRAFT
+        set del='1'
+    WHERE
+        WIN_MODEL_ID = #{winModelId}
+        AND CODE != '1'
+  </delete>
+
+
+  <select id="findMilestone" resultType="com.jh.entity.MesWinModelCraft">
+            SELECT
+                  MES_WIN_MODEL_CRAFT.NUMBERS
+            FROM
+                MES_WIN_MODEL_CRAFT
+                RIGHT JOIN MES_PROCESS_QUOTA ON MES_WIN_MODEL_CRAFT.NAME = MES_PROCESS_QUOTA.ID
+            WHERE
+                MES_WIN_MODEL_CRAFT.DEL='0'
+                AND MES_WIN_MODEL_CRAFT.WIN_MODEL_ID = #{winModelId}
+                <if test="status != null and status != '' ">
+                  AND MES_PROCESS_QUOTA.STATUS = #{status}
+                </if>
+                AND MES_WIN_MODEL_CRAFT.NAME = #{name}
+    </select>
+
+
+</mapper>

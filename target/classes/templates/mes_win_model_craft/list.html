@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>tree-table</title>
+    <link rel="stylesheet" href="/treetable-lay/assets/layui/css/layui.css">
+    <link rel="stylesheet" href="/treetable-lay/assets/common.css"/>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <style>
+        .layui-container {
+            width: 100%;
+            padding-top: 5px;
+        }
+        .layui-input, .layui-select, .layui-textarea {
+            height: 30px;
+
+        }
+        body {
+            background: url(/images/bg.png) no-repeat center;
+            background-size: cover;
+            height: 100%;
+        }
+        .background {
+            background: url(/images/bg.png) no-repeat center;
+            background-size: cover;
+            height: 600px;
+        }
+    </style>
+
+
+</head>
+<body  class="x-body">
+<div class="background">
+
+
+<input type="hidden" id="id">
+<input type="hidden" id="name">
+<input type="hidden" id="wmcId">
+<div class="layui-container">
+    <div class="layui-container layui-card-body" >
+        <input type="hidden"   id="winId" name="winId"   autocomplete="off" class="">
+        <div class="layui-inline layui-show-xs-block">
+            <input type="text" name="code"  id="code" placeholder="窗型编号" style="text-transform:uppercase;" autocomplete="off" class="layui-input" >
+        </div>
+
+        <div class="layui-inline layui-show-xs-block">
+            <input type="text"  disabled="disabled" id="winName" name="winName"  placeholder="窗型名称(自动获取)" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-inline layui-show-xs-block">
+            <button class="layui-btn" id="btn-search" data-type="reload">搜索</button>
+        </div>
+
+        <div style="float:right;padding-right: 2%">
+            <button class="layui-btn" th:onclick="audit()"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='6'and ${menuButton.status}=='1'">审核</button>
+            <button class="layui-btn"  th:onclick="copy()"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='10'and ${menuButton.status}=='1'">复制从……生成</button>
+            <button type="button" class="layui-btn" id="uploadExcel"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='11'and ${menuButton.status}=='1'"><i class="layui-icon"></i>导入Excel</button>
+            <button class="layui-btn" id="createExcel" th:onclick="createExcel('/mesWinModel/createExcel')" >
+                <i class="layui-icon layui-icon-download-circle"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='12'and ${menuButton.status}=='1'"></i>  下载模板</button>
+            <button class="layui-btn" id="exportExcel" th:onclick="exportExcel()">
+                <i class="layui-icon layui-icon-download-circle"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='13'and ${menuButton.status}=='1'"></i>  导出数据</button>
+        </div>
+
+    </div>
+
+    <table id="table1" class="layui-table" lay-filter="table1"></table>
+</div>
+</div>
+<!-- 操作列 -->
+
+<script src="/treetable-lay/assets/layui/layui.js"></script>
+
+<script>
+
+    layui.config({
+        base: '/treetable-lay/module/'
+    }).extend({
+        treetable: 'treetable-lay/treetable'
+    }).use(['table', 'form', 'element', 'treetable'], function () {
+        var $ = layui.jquery;
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+        var treetable = layui.treetable;
+        // 渲染表格
+        var renderTable = function () {
+            treetable.render({
+                treeDefaultClose: false,
+                treeLinkage: true,
+                treeColIndex: 1,
+                treeSpid: '0',		//最上级的父级id
+                treeIdName: 'd_id',
+                treePidName: 'd_pid',
+                elem: '#table1',
+               /* url: '/treetable-lay/json/data1.json',*/
+                url:'/mesWinModelCraft/findList',
+                page: false,
+                where : {
+                    'winModelId': $("#winId").val()
+                },
+                cols: [
+                    [
+                    {type: 'numbers', title: '序号',width:70},
+                    {field: 'name', title: '名称'},
+                    {field: 'number', title: '数量'},
+                    {title: '操作',templet :function(d){
+                            if(d.lever == 1){
+                                return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n';
+                            }else if(d.lever == 4){
+                                return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n' +
+                                    '    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">修改</a>\n' +
+                                    '    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>';
+                            }else{
+                                return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n' +
+                                    '    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">修改</a>\n' +
+                                    '    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>';
+                            }
+                        }}
+                ]
+                ],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+            });
+        };
+
+        renderTable();
+
+        $('#btn-expand').click(function () {
+            treetable.expandAll('#table1');
+        });
+
+        $('#btn-fold').click(function () {
+            treetable.foldAll('#table1');
+        });
+
+        $('#btn-refresh').click(function () {
+            renderTable();
+        });
+
+        //监听行工具事件
+        table.on('tool(table1)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                $.ajax({
+                    url:'/mesWinModelCraft/findTask',
+                    data:{
+                        'id':data.id
+                    },
+                    success:function(res){
+                        if (res.status) {
+                            layer.msg(res.msg, {icon: 1, time: 2000});
+                            return false;
+                        }else{
+                                    layer.confirm('确认删除', function(index){
+                                        $.ajax({
+                                            url:'/mesWinModelCraft/del',
+                                            data:{
+                                                'id':data.id
+                                            },
+                                            success:function(res){
+                                                if (res.status) {
+                                                    find();
+                                                    layer.msg(res.msg, {icon: 1, time: 2000});
+                                                }else{
+                                                    layer.msg(res.msg, {icon: 7, time: 2000});
+                                                }
+                                            }
+                                        })
+                                    });
+                          }
+                        }
+                    })
+            } else if(obj.event === 'edit'){
+                $.ajax({
+                    url:'/mesWinModelCraft/findTask',
+                    data:{
+                        'id':data.id
+                    },
+                    success:function(res){
+                        if (res.status) {
+                            layer.msg(res.msg, {icon: 7, time: 2000});
+                            return false;
+                        }else{
+                            layer.open({
+                                type: 2,
+                                title: "编辑",
+                                shadeClose: true,
+                                shade: 0.8,
+                                area: ['100%', '100%'],
+                                maxmin: true,
+                                content:"/mesWinModelCraft/edit?id="+data.id,
+                                end : function(){
+                                    find();
+                                }
+                            });
+                        }
+                    }
+                })
+                renderTable();
+            }else if(obj.event === 'add'){
+                $.ajax({
+                    url:'/mesWinModelCraft/findTask',
+                    data:{
+                        'id':data.id
+                    },
+                    success:function(res){
+                        if (res.status) {
+                            layer.msg(res.msg, {icon: 7, time: 2000});
+                            return false;
+                        }else{
+                            layer.open({
+                                type: 2,
+                                title: "添加",
+                                shadeClose: true,
+                                shade: 0.8,
+                                area: ['100%', '100%'],
+                                maxmin: true,
+                                content:"/mesWinModelCraft/from?parentId="+data.id,
+                                end : function(){
+                                    find();
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+            renderTable();
+        });
+
+
+
+        $('#btn-search').click(function () {
+            var code=$("#code").val().trim().toUpperCase();
+            if(code == ""){
+                layer.msg("窗型编号不能为空.", {icon: 7, time: 2000})
+                return;
+            }
+            $.ajax({
+                url:'/mesWinModel/findWinModel',
+                data:{
+                    'code':code
+                },
+                success:function(res){
+                    if(res.status){
+                        $("#winId").val(res.list[0].winId)
+                        $("#winName").val(res.list[0].winName)
+                        if(res.list[0].status.trim() == "2"){
+                            $("#remark").val(res.list[0].remark)
+                            $(".remark").show();
+                        }else{
+                            $(".remark").hide();
+                        }
+                        find();
+                    }else{
+                        layer.msg(res.msg,{icon:7,time:2000});
+                    }
+                }
+            })
+
+        });
+        
+        
+        
+        function find() {
+            // 渲染表格
+            treetable.render({
+                treeDefaultClose: false,
+                treeLinkage: true,
+                treeColIndex: 1,
+                treeSpid: '0',		//最上级的父级id
+                treeIdName: 'd_id',
+                treePidName: 'd_pid',
+                elem: '#table1',
+                url:'/mesWinModelCraft/findList',
+                page: false,
+                where : {
+                    'winModelId': $("#winId").val()
+                },
+                cols: [
+                    [
+                        {type: 'numbers',width:70},
+                        {field: 'name', title: '名称'},
+                        {field: 'number', title: '数量'},
+                        {title: '操作',templet :function(d){
+                                if(d.lever == 1){
+                                    return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n';
+                                }else if(d.lever == 4){
+                                    return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n' +
+                                        '    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">修改</a>\n' +
+                                        '    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>';
+                                }else{
+                                    return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'1\'and ${menuButton.status}==\'1\'">添加下级</a>\n' +
+                                        '    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'2\'and ${menuButton.status}==\'1\'">修改</a>\n' +
+                                        '    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}==\'5\'and ${menuButton.status}==\'1\'">删除</a>';
+                                }
+                            }}
+                    ]
+                ],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+            });
+        }
+    });
+
+    layui.use('upload', function(){
+        var $ = layui.jquery,
+            upload = layui.upload;
+        upload.render({
+            elem: '#uploadExcel',
+            url: '/mesWinModel/importExcel',
+            accept: 'file' ,//普通文件
+            exts: 'xlsx|xls' ,//允许上传的文件后缀
+            done: function(res){
+                layer.msg(res.msg, {icon: 7, time: 3000});
+                setTimeout(function (){
+                    $(".layui-laypage-btn")[0].click();
+                }, 3000);
+
+            }
+        })
+    });
+    function exportExcel(){
+        var code=$("#code").val();
+        if(code== null || code=="" ){
+            layer.msg("窗型编号不能为空.", {icon: 7, time: 2000})
+            return;
+        }
+        window.location.href= '/mesWinModel/exportExcel?winModelId='+$("#winId").val();
+    }
+
+
+    function createExcel(url){
+        window.location.href=url;
+    }
+
+    function copy(){
+        var code=$("#code").val().toUpperCase();
+        if(code == ""){
+            layer.msg("窗型编号不能为空",{icon:7,time:2000});
+            return;
+        }
+        layer.open({
+            type: 2,
+            title:"参照生成",
+            shadeClose: true,
+            shade: 0.8,
+            area: ['100%', '100%'],
+            content: "/mesWinModelCraft/copyFrom?code="+code ,//iframe的url
+            maxmin: true,
+            end : function(){
+                findWinModel();
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

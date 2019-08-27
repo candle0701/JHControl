@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/css/font.css" />
+    <link rel="stylesheet" href="/css/xadmin.css" />
+    <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/ajax-util.js"></script>
+    <script type="text/javascript" src="/js/cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+</head>
+<style>
+    .file {
+        position: relative;
+        display: inline-block;
+        background: #D0EEFF;
+        border: 1px solid #99D3F5;
+        border-radius: 4px;
+        padding: 4px 12px;
+        overflow: hidden;
+        color: #1E88C7;
+        text-decoration: none;
+        text-indent: 0;
+        line-height: 20px;
+    }
+    .file input {
+        position: absolute;
+        font-size: 100px;
+        right: 0;
+        top: 0;
+        opacity: 0;
+    }
+    .file:hover {
+        background: #AADFFD;
+        border-color: #78C3F3;
+        color: #004974;
+        text-decoration: none;
+    }
+    body {
+        background: url(/images/bg.png) no-repeat center;
+        background-size: cover
+    }
+    .layui-form-label {
+        width: 10%;
+    }
+    .layui-input-block {
+        margin-left: 12%;
+    }
+</style>
+</head>
+<body>
+<div class="x-body">
+    <form class="layui-form layui-col-space5">
+    <div class="layui-form-item">
+        <label for="winName" class="layui-form-label">
+            <span class="x-red">*</span>窗型编码：
+        </label>
+        <div class="layui-input-inline">
+            <input style="text-transform:uppercase;" type="text" id="code" name="code"  placeholder="" class="layui-input" onblur="verifyCode()">
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label for="winName" class="layui-form-label">
+            <span class="x-red">*</span>窗型名称：
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" id="winName" name="winName"  placeholder="" class="layui-input" onblur="verifyName()">
+        </div>
+
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label for="winName" class="layui-form-label">
+            <span class="x-red">*</span>窗型类型：
+        </label>
+        <div class="layui-input-inline">
+            <select name="winDictionariesId" id="winDictionariesId" style="height: 38px;" lay-search>
+                <option th:each=" list : ${dicList} " th:value="${list.dicId}" th:text="${list.name}"></option>
+            </select>
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="winName" class="layui-form-label">
+            <span class="x-red">*</span>窗型类别：
+        </label>
+        <div class="layui-input-inline">
+            <select name="modelStatus"  id="modelStatus" style="height: 38px;" lay-filter="modelStatusFilter"   >
+                <option value=""> -- 请选择 -- </option>
+                <option value="1">基本窗型</option>
+                <option value="2">项目窗型</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="layui-form-item uploadUrl" style="display: none">
+        <label for="winName" class="layui-form-label">
+            <span class="x-red">*</span>上传：
+        </label>
+        <div class="layui-input-inline">
+            <button type="button" class="layui-btn" id="upload">
+                <i class="layui-icon">&#xe67c;</i>选择文件</button>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label  class="layui-form-label">
+            <span class="x-red"></span>
+        </label>
+        <div class="layui-input-inline">
+            <input type="hidden" id="winUrl" name="winUrl"  placeholder="" class="layui-input" >
+            <input type="hidden" id="url" name="url"  placeholder="" class="layui-input" >
+            <img src="#" id="imgage" width="190px" height="100px" style="display: none">
+        </div>
+
+    </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <span  class="layui-btn" lay-filter="add" onclick="add()">
+                    立即提交
+                </span>
+             </div>
+    </div>
+</form>
+</div>
+<script>
+    // function  gradeChange() {
+    //     var modelStatus=$("#modelStatus").val()
+    //     if(modelStatus == "1"){
+    //         $(".uploadUrl").show();
+    //
+    //     }else{
+    //         $(".uploadUrl").hide();
+    //         $("#imgage").css('display','none');
+    //     }
+    // }
+
+    function add(){
+        var code = $("#code").val().toUpperCase();
+        var winName = $("#winName").val();
+        var winDictionariesId = $("#winDictionariesId").val();
+        var winUrl = $("#winUrl").val();
+        var modelStatus = $("#modelStatus").val();
+        if(code== null || code=="" ){
+            layer.msg("窗型编号不能为空.", {icon: 7, time: 1000})
+            return;
+        }
+        if(winName== null || winName=="" ){
+            layer.msg("窗型名称不能为空.", {icon: 7, time: 1000})
+            return;
+        }
+        if(winDictionariesId== null || winDictionariesId=="" ){
+            layer.msg("窗型类型不能为空.", {icon: 7, time: 1000})
+            return;
+        }
+        if(modelStatus== null || modelStatus=="" ){
+            layer.msg("窗型类别不能为空.", {icon: 7, time: 1000})
+            return;
+        }
+        if(modelStatus == "1"){
+            if(winUrl== null || winUrl=="" ){
+                layer.msg("请先上传图片.", {icon: 7, time: 1000})
+                return;
+            }
+        }else{
+            winUrl="";
+        }
+        layer.confirm('确认要提交吗？',function() {
+            $.ajax({
+                url: '/mesWinModel/add',
+                data: {
+                    'code':code,
+                    'winName': winName,
+                    'winDictionariesId': winDictionariesId,
+                    'winUrl':winUrl,
+                    'modelStatus':modelStatus
+                },
+                success: function (res) {
+                    if (res.status) {
+                        layer.msg(res.msg, {icon: 1, time: 2000});
+                        setTimeout(function (){
+                            window.parent.location.reload();
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        }, 2000);
+
+                    }else{
+                        layer.msg(res.msg, {icon: 7, time: 2000});
+                    }
+                }
+            })
+        });
+    }
+
+    function verifyName(){
+        var winName=$("#winName").val();
+        if(winName== null || winName=="" ){
+            layer.msg("窗型名称不能为空.")
+            return;
+        }
+        $.ajax({
+            url:'/mesWinModel/verify',
+            data:{
+                'winName':winName
+            },
+            success:function(res){
+                if(res.status){
+                    $("#winName").val("");
+                    layer.msg(res.msg,{icon:1,time:2000});
+                }
+            }
+
+        });
+    }
+    function verifyCode(){
+        var code = $("#code").val();
+        if(code== null || code=="" ){
+            layer.msg("窗型编号不能为空.", {icon: 7, time: 1000})
+            return;
+        }
+        $.ajax({
+            url:'/mesWinModel/verify',
+            data:{
+                'code':code
+            },
+            success:function(res){
+                if(res.status){
+                    $("#code").val("");
+                    layer.msg(res.msg,{icon:1,time:2000});
+                }
+            }
+
+        });
+    }
+    layui.use(['upload','form'], function(){
+        var upload = layui.upload;
+        var form = layui.form;
+
+        form.on('select(modelStatusFilter)', function(data){
+            var modelStatus=$("#modelStatus").val()
+            if(modelStatus == "1"){
+                $(".uploadUrl").show();
+
+            }else{
+                $(".uploadUrl").hide();
+                $("#imgage").css('display','none');
+            }
+        });
+
+        //执行上传
+        var uploadInst = upload.render({
+            elem: '#upload' //绑定元素
+            ,url: '/FileUpload/upload' //上传接口
+            ,method: 'POST'
+            ,accept: 'images'
+            ,acceptMime: 'image/jpg, image/png'
+            ,size: 5020
+            ,done: function(res){//上传完毕回调
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败', {icon: 7, time: 2000});
+                }
+                //上传成功
+                $("#imgage").css('display','block');
+                $("#imgage").attr('src',res.src);
+                $("#winUrl").val(res.src)
+                $("#url").val(res.src)
+                return layer.msg('上传成功');
+            }
+            ,error: function(){//请求异常回调
+                layer.closeAll('loading');
+                layer.msg('网络异常，请稍后重试！', {icon: 7, time: 2000});
+            }
+        });
+    });
+</script>
+</body>
+</html>

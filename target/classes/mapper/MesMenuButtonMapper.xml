@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesMenuButtonMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesMenuButton">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="MENU_ID" jdbcType="VARCHAR" property="menuId" />
+    <result column="BUTTON_ID" jdbcType="VARCHAR" property="buttonId" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="ROLE_ID" jdbcType="VARCHAR" property="roleId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, MENU_ID, BUTTON_ID, STATUS,ROLE_ID
+  </sql>
+  <select id="getButtonByRoleIdAndMenuId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from mes_menu_button where
+     1=1
+     <if test="roleId != null and roleId != ''">
+       and   role_id=#{roleId}
+     </if>
+    <if test="menuId != null and menuId != ''">
+       and menu_id=#{menuId}
+    </if>
+
+  </select>
+  <select id="getAllButton" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from MES_MENU_BUTTON
+    where role_ID = '1'
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MES_MENU_BUTTON
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MES_MENU_BUTTON
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByRoleId" parameterType="java.lang.String">
+    delete from MES_MENU_BUTTON
+    where ROLE_ID = #{roleId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.jh.entity.MesMenuButton">
+    insert into MES_MENU_BUTTON (ID, MENU_ID, BUTTON_ID, 
+      STATUS,ROLE_ID)
+    values (#{id,jdbcType=VARCHAR}, #{menuId,jdbcType=VARCHAR}, #{buttonId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}),#{roleId}
+  </insert>
+  <insert id="insertSelective" parameterType="com.jh.entity.MesMenuButton">
+    insert into MES_MENU_BUTTON
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="menuId != null">
+        MENU_ID,
+      </if>
+      <if test="buttonId != null">
+        BUTTON_ID,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if><if test="roleId != null">
+        ROLE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="menuId != null">
+        #{menuId,jdbcType=VARCHAR},
+      </if>
+      <if test="buttonId != null">
+        #{buttonId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if><if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jh.entity.MesMenuButton">
+    update MES_MENU_BUTTON
+    <set>
+      <if test="menuId != null">
+        MENU_ID = #{menuId,jdbcType=VARCHAR},
+      </if>
+      <if test="buttonId != null">
+        BUTTON_ID = #{buttonId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if><if test="roleId != null">
+        ROLE_ID = #{roleId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jh.entity.MesMenuButton">
+    update MES_MENU_BUTTON
+    set MENU_ID = #{menuId,jdbcType=VARCHAR},
+      BUTTON_ID = #{buttonId,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      ROLE_ID = #{roleId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

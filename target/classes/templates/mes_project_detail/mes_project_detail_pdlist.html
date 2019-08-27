@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/lib/layui/css/layui.css" />
+
+    <link rel="stylesheet" href="/css/font.css" />
+    <link rel="stylesheet" href="/css/xadmin.css" />
+    <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/ajax-util.js"></script>
+    <script type="text/javascript" src="/js/cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+
+    <style>
+        .layui-table-cell {
+            height: auto;
+            line-height: 28px;
+            padding: 0 15px;
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            box-sizing: border-box;
+        }
+        select{
+            height: 30px;
+        }
+
+        .layui-input-block {
+            margin-left: 15px;
+            min-height: 36px;
+            margin-right: 15px;
+        }
+        body {
+            background: url(/images/bg.png) no-repeat center;
+            background-size: cover
+        }
+    </style>
+</head>
+<body>
+<div class="layui-card-body ">
+    <div class="layui-form layui-col-space5">
+    <div class="layui-input-inline layui-show-xs-block">
+        <select name="projectId" id="projectId" autocomplete="off"  lay-search>
+            <option value="">请选择</option>
+            <option th:each=" list:${projectList}"
+                    th:value="${list.projectId}"
+                    th:text="${list.projectName}"
+            ></option>
+        </select>
+    </div>
+    <div class="layui-inline layui-show-xs-block">
+        <input type="text" name="bdate" id="bdate" placeholder="开始日期" disabled="disabled" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-inline layui-show-xs-block">
+        <input type="text" id="edate"name="edate" placeholder="结束日期" disabled="disabled" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-inline layui-show-xs-block">
+
+        <input type="text" id="state"name="state" placeholder="审核状态" disabled="disabled" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-inline layui-show-xs-block">
+        <button class="layui-btn find" id="layui-btn" data-type="reload" >搜索</button>
+    </div>
+</div>
+<div class="layui-form-item layui-form-text" style="display: none">
+    <label class="layui-form-label"></label>
+    <div class="layui-input-block ">
+        <textarea placeholder="驳回原因" class="layui-textarea" id="projectRemark" ></textarea>
+    </div>
+
+</div>
+</div>
+<div >
+    <div class="layui-card-header">
+        <button class="layui-btn" th:onclick="from('添加')" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='1'and${menuButton.status}=='1'" ><i class="layui-icon" ></i>添加</button>
+        <button  class="layui-btn " onclick="audit()"th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='9'and${menuButton.status}=='1'" >审核</button>
+    </div>
+</div>
+<div class="layui-card-body layui-text"  style="padding-top: 0px">
+    <div id="toolbar">
+    </div>
+    <div id="tableRes" class="table-overlay">
+        <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+    </div>
+
+</div>
+<script type="text/html" id="operation">
+    <a class="layui-btn layui-btn-xs" lay-event="edit" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='2'and${menuButton.status}=='1'"  >编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='5'and${menuButton.status}=='1'" >删除</a>
+</script>
+<script>
+    var projectId=$("#projectId").val();
+    layui.use('table', function(){
+        var table = layui.table;
+        table.render({
+            elem: '#dataTable',
+            url:"/mesProjectDetail/pagePdList",
+            page: true,
+            limit: 10,
+            limits: [10,15,30],
+            where:{
+                "projectId":projectId
+            },
+            cols: [
+                [
+                    {title: '序号', type: 'numbers',align:'left',width:70},
+                    {field: 'winNo',title: '窗号',minWidth:100},
+                    {field: 'partyWinNo',title: '甲方窗号',minWidth:100},
+                    {field: 'winTypeId',title: '窗型',minWidth:200},
+                    {field: 'num',title: '数  量',minWidth:75},
+                    {field: 'blueprintWidth',title: '图纸宽',minWidth:75},
+                    {field: 'drawingHeight',title: '图纸高',minWidth:75},
+                    {field: 'winWidth',title: '洞口宽',minWidth:75},
+                    {field: 'winHeight',title: '洞口高',minWidth:75},
+                    {field: 'preTotal',title: '暂估工程量',minWidth:110},
+                    {field: 'price',title: '合同单价',minWidth:100},
+                    {title: '操作'  ,align:'left',toolbar: '#operation',width:150},
+                ]
+            ],
+            done:function (res,curr,count) {
+                $.ajax({
+                    url:'/mesProject/sel',
+                    data:{
+                        'projectId':$("#projectId").val()
+                    },
+                    success:function(res){
+                        $("#bdate").val(res.bdate)
+                        $("#edate").val(res.edate)
+                        if(res.state == '1'){
+                            $("#state").val("审核通过")
+                            $(".layui-form-text").css("display","none")
+                        }else if(res.state == '2'){
+                            $("#state").val("审核被驳回")
+                            $("#projectRemark").val(res.projectRemark)
+                            $(".layui-form-text").css("display","block")
+                        }else{
+                            $("#state").val("未审核")
+                            $(".layui-form-text").css("display","none")
+                        }
+
+                    }
+                })
+
+            }
+
+        });
+            //监听行工具事件
+            table.on('tool(dataTable)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'del'){
+                    layer.confirm('确认删除', function(index){
+                        $.ajax({
+                            url:'/mesProjectDetail/delete',
+                            data:{
+                                'id':data.id,
+                                'winNo':data.winNo
+
+                            },
+                            success:function(res){
+                                if (res) {
+                                    layer.msg("删除成功", {icon: 1, time: 2000});
+                                    $(".layui-laypage-btn")[0].click();
+                                }else{
+                                    layer.msg("删除失败", {icon: 7, time: 2000});
+                                    $(".layui-laypage-btn")[0].click();
+                                }
+                            }
+                        })
+                    });
+                } else if(obj.event === 'edit'){
+                    layer.open({
+                        type: 2,
+                        title:"编辑",
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['100%', '100%'],
+                        content: "/mesProjectDetail/edit?winNo="+data.winNo ,//iframe的url
+                        maxmin: true,
+                        end:function () {
+                            $(".layui-laypage-btn")[0].click();
+                        }
+                    })
+
+                }
+            });
+            //重载
+            var $ = layui.$, active = {
+                reload: function(){
+                    var projectId = $('#projectId').val();
+                    //执行重载
+                    table.reload('dataTable', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        ,where: {
+                            projectId: projectId
+
+                        }
+                    });
+                }
+            };
+            //查询触发
+            $('#layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+    });
+    function from(obj,url){
+        var projectId = $('#projectId').val();
+        if(projectId== null || projectId=="" ){
+            layer.msg("请先选择项目", {icon: 7, time: 2000});
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: obj,
+            shadeClose: true,
+            shade: 0.8,
+            area: ['100%', '100%'],
+            content:"/mesProjectDetail/form?projectId="+projectId,//iframe的url
+            maxmin: true,
+            end:function () {
+                $(".layui-laypage-btn")[0].click();
+            }
+        });
+    }
+
+
+
+ function audit() {
+     var projectId = $('#projectId').val();
+     if(projectId== null || projectId=="" ){
+         layer.msg("请先选择项目", {icon: 7, time: 2000});
+         return;
+     }
+
+     $.ajax({
+         url:'/mesProjectDetail/mesProjectDetailFind',
+         data:{
+             'projectId':projectId
+         },
+         success:function(res){
+            if(res){
+                layer.msg("请先添加项目详情信息", {icon: 7, time: 2000});
+                return;
+            }else{
+
+                layer.open({
+                    type: 2,
+                    title:"项目审核",
+                    shadeClose: true,
+                    shade: 0.8,
+                    maxmin: true,
+                    area: ['100%', '100%'],
+                    content: "/mesProject/mesProjectAudit?projectId="+projectId ,//iframe的url
+                    end:function () {
+                        $.ajax({
+                            url:'/mesProject/sel',
+                            data:{
+                                'projectId':projectId
+                            },
+                            success:function(res){
+                                if(res.state == '1'){
+                                    $("#state").val("审核通过")
+                                    $(".layui-form-text").css("display","none")
+                                }else if(res.state == '2'){
+                                    $("#state").val("审核被驳回")
+                                    $("#projectRemark").val(res.projectRemark)
+                                    $(".layui-form-text").css("display","block")
+                                }else{
+                                    $("#state").val("未审核")
+                                    $(".layui-form-text").css("display","none")
+                                }
+
+                            }
+                        })
+                    }
+                })
+            }
+         }
+     })
+
+
+ }
+</script>
+
+</body>
+</html>

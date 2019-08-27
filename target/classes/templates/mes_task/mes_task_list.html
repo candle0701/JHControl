@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <title>生产计划列表</title>
+  <meta name="renderer" content="webkit|ie-comp|ie-stand">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="stylesheet" href="/css/font.css" />
+  <link rel="stylesheet" href="/css/xadmin.css" />
+  <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+  <script src="/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/js/xadmin.js"></script>
+  <script type="text/javascript" src="/js/ajax-util.js"></script>
+  <script type="text/javascript" src="/js/cookie.js"></script>
+  <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/pagination/jquery.pagination.js"></script></head>
+<style>
+  body{overflow-y: scroll;} /* 禁止刷新后出现横向滚动条 */
+  body {
+    background: url(/images/bg.png) no-repeat center;
+    background-size: cover
+  }
+</style>
+<body>
+<div class="x-body">
+  <div class="layui-row">
+    <div style="margin-bottom:10px;color:#009688;font-size: 20px;" font-size="border"><i class="layui-icon" style="font-size: 30px;">&#xe702;</i>&nbsp;请注意：单击某列隐藏该列，点击刷新按钮恢复页面<br></div>
+    <div class="layui-form layui-col-md12 x-so">
+      <input type="text"  onkeyup="this.value=this.value.toUpperCase()" id="search"  placeholder="请输入作业单编号" autocomplete="off" class="layui-input">
+      <button class="layui-btn" th:onclick="task_search()" >查询</button>
+      <button class="layui-btn" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='1'and ${menuButton.status}=='1'" th:onclick="x_admin_show('添加','/mesTask/toMesTaskAdd','','')">添加</button>
+      <button class="layui-btn" onclick="refresh()" >刷新</button>
+    </div>
+  </div>
+  <div id="frenshDiv" th:fragment="table_refresh">
+    <input style="display:none;" id="totalPage" th:value="${mesTaskList.pages}"/>
+
+    <table class="layui-table" style="padding-top: 20px;table-layout:fixed;width: 100%" id="tableDiv">
+      <thead>
+      <tr>
+        <th style="width:180px;" name="th">项目名称</th>
+        <th style="width:120px;" name="th">作业单编号</th>
+        <th style="width:180px;" name="th">作业单名称</th>
+        <th style="width:80px;" name="th">下发时间</th>
+        <th style="width:80px;" name="th">交付时间</th>
+        <th style="width:80px;" name="th">创建人</th>
+        <th style="width:120px;" name="th">创建日期</th>
+        <th style="width:80px;" name="th">作业单类型</th>
+        <th style="width:80px;" name="th">总樘数</th>
+        <th style="width:30px;" name="th">楼号</th>
+        <th style="width:60px;" name="th">楼层</th>
+        <th style="width:80px;" name="th">紧急状态</th>
+        <th style="width:80px;" name="th">作业单状态</th>
+        <th style="width:360px;">操作</th>
+      </thead>
+      <tbody>
+      <tr th:each="mesTask : ${mesTaskList.list}">
+
+        <td name='td' th:text="${mesTask.mesProject.projectName}">admin</td>
+        <td name='td'>
+          <button th:onclick="x_admin_show('','/mesTask/taskIdButtonDetail',[[${mesTask.id}]],'','')"  th:text="${mesTask.id}" class="layui-btn layui-btn layui-btn-xs">
+            审核
+          </button>
+        </td>
+
+        <td name='td' th:text="${mesTask.taskName}">超级管理员</td>
+        <td name='td' th:text="${mesTask.downTime}">admin</td>
+        <td name='td' th:text="${mesTask.deliveryTime}">18925139194</td>
+        <td name='td' th:text="${mesTask.mesUsers.nickname}">超级管理员</td>
+        <td name='td' th:text="${mesTask.createTime}">超级管理员</td>
+        <td name='td' th:text="${mesTask.taskType}">超级管理员</td>
+        <td name='td' th:text="${mesTask.totalNum}">超级管理员</td>
+        <td name='td' th:text="${mesTask.buildingNo}">超级管理员</td>
+        <td name='td' th:text="${mesTask.floorNo}">超级管理员</td>
+        <td name='td' th:text="${mesTask.urgentStatus}=='0'?'正常':'紧急'">超级管理员</td>
+        <td name='td' th:text="${mesTask.mesDictionaries.name}">超级管理员</td>
+        <td class="td-manage">
+          <button title="查看"  th:onclick="x_admin_show('查看','/mesTask/toMesTaskQuery',[[${mesTask.id}]],'','')" class="layui-btn layui-btn layui-btn-primary">
+            查看
+          </button>
+          <button title="状态维护" th:disabled="${mesTask.taskStatus eq ''?true:false}"  th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='30'and${menuButton.status}=='1'" th:onclick="x_admin_show('状态维护','/mesTask/toMesTaskChangeStatus',[[${mesTask.id}]],'','')" class="layui-btn layui-btn layui-btn-primary">
+            状态维护
+          </button>
+          <button title="编辑" th:disabled="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE'  ?true:false}" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='2'and${menuButton.status}=='1'" th:onclick="x_admin_show('编辑','/mesTask/toMesTaskEdit',[[${mesTask.id}]],'','')" th:class="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE' ?'layui-btn layui-btn-disabled':'layui-btn layui-btn layui-btn-xs'}">
+            编辑
+          </button>
+          <button title="审核" th:disabled="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE' ?true:false}" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='9'and${menuButton.status}=='1'" th:onclick="x_admin_show('审核','/mesTask/toMesTaskCheck',[[${mesTask.id}]],'','')" th:class="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE' ?'layui-btn layui-btn-disabled':'layui-btn layui-btn layui-btn-xs'}">
+            审核
+          </button>
+          <button title="删除" th:disabled="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE'  ?true:false}" th:each="menuButton:${menuButtonList}" th:if="${menuButton.buttonId}=='5'and${menuButton.status}=='1'" th:onclick="Task_del(this,[[${mesTask.id}]])" th:class="${mesTask.taskStatus eq 'TASK_ORDER' || mesTask.taskStatus eq 'TASK_RELEASE' || mesTask.taskStatus eq 'TASK_ING' || mesTask.taskStatus eq 'TASK_CLOSE' ?'layui-btn layui-btn-disabled':'layui-btn-danger layui-btn layui-btn-xs'}">
+            删除
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="page" class="page" th:if="${mesTaskList.size gt 10}"></div>
+</div>
+<script>
+
+  var currentPage = '';
+  $(function(){
+    currentPage = $("#totalPage").val();
+    pageinit(currentPage);
+
+    $("th[name='th']").click(function(){
+      $(this).hide()
+      $("#tableDiv tr").find("td:eq("+$(this)[0].cellIndex+")").hide()
+    })
+  })
+
+  function pageinit(curr){
+    $('#page').pagination({
+      coping: true,
+      homePage: '首页',
+      endPage: '末页',
+      prevContent: '上一页',
+      nextContent: '下一页',
+      pageCount: curr,
+      callback: function (api) {
+        var url = '/mesTask/toMesTaskList?pageNum='+api.getCurrent()+'&id='+$.trim($("#search").val())
+        $('#frenshDiv').load(url);
+      }
+    });
+  }
+
+  function task_search(){
+    var url = '/mesTask/toMesTaskList?pageNum=1&id='+$.trim($("#search").val())+'&menuId=301'
+    $('#frenshDiv').load(url,'',function () {
+      //查询后页数改变，重新加载分页
+      currentPage = $("#totalPage").val();
+      pageinit(currentPage);
+
+      if(parseInt($("#total").text())<10){
+        $("#page").attr("style", "display:none");
+      }else{
+        $("#page").attr("style", "display:block");
+      }
+    });
+
+  }
+
+
+  /*用户-删除*/
+  function Task_del(obj,id){
+    layer.confirm('确认要删除吗？',function(){
+      $.ajax({
+        url:'/mesTask/deleteByPrimaryKey',
+        data:{
+          'id':id
+        },
+        success:function(res){
+          if(res.status){
+            location.reload();
+            layer.msg(res.msg,{icon:1,time:1000});
+          }else{
+            layer.msg(res.msg,{icon:1,time:1000});
+          }
+        }
+      })
+    });
+  }
+
+  function refresh(){
+    location.reload();
+  }
+</script>
+</body>
+
+</html>

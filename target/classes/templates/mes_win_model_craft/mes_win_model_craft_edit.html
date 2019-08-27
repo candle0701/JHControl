@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/lib/layui/css/layui.css" />
+
+    <link rel="stylesheet" href="/css/font.css" />
+    <link rel="stylesheet" href="/css/xadmin.css" />
+    <script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/ajax-util.js"></script>
+    <script type="text/javascript" src="/js/cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <style>
+        body {
+            background: url(images/bg.png) no-repeat center;
+            background-size: cover
+        }
+    </style>
+
+</head>
+<style>
+    .layui-input, .layui-textarea{
+        width: 30%;
+    }
+    .layui-input, .layui-textarea{
+        width: 30%;
+    }
+    .layui-form-select dl {
+        min-width: 30%;
+    }
+    .layui-edge{
+        display: none;
+    }
+    .layui-form-label {
+        width: 10%;
+    }
+    .layui-input-block {
+        margin-left: 12%;
+    }
+</style>
+<body>
+<form class="layui-form" id="form" onsubmit="return false;" style="padding-top: 20px;">
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label"><span class="x-red">*</span>ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="id" id="id"  autocomplete="off"  class="layui-input" th:value="${mesWinModelCraft.id}">
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label"><span class="x-red">*</span>ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="winModelId" id="winModelId"  autocomplete="off"  class="layui-input" th:value="${mesWinModelCraft.winModelId}">
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label"><span class="x-red">*</span>ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="parentId" id="parentId"  autocomplete="off"  class="layui-input" th:value="${mesWinModelCraft.parentId}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="x-red">*</span>名称：</label>
+        <div class="layui-input-block">
+            <select name="name" lay-filter="aihao" id="name" lay-verify="name" lay-search>
+                <option value="">请选择</option>
+                <option  th:if="${code != 4}"
+                         th:each=" li :${list}"
+                         th:text="${li.name}"
+                         th:value="${li.dicId}"
+                         th:field="*{mesWinModelCraft.name}"
+                ></option>
+                <option  th:if=" ${code == 4}"
+                         th:each=" li :${list}"
+                         th:text="${li.name}"
+                         th:value="${li.id}"
+                         th:field="*{mesWinModelCraft.name}"
+                ></option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="x-red">*</span>数量：</label>
+        <div class="layui-input-block">
+            <input type="text" name="numbers"  autocomplete="off" lay-verify="required|number"  class="layui-input" th:value="${mesWinModelCraft.numbers}">
+        </div>
+    </div>
+   <!-- <div class="layui-form-item" th:if="${mesWinModelCraft.code eq '2'}">
+        <label class="layui-form-label"><span class="x-red">*</span>面积百分比</label>
+        <div class="layui-input-block">
+            <input type="text" name="percentage"  autocomplete="off"  lay-verify="required|percentage"  class="layui-input" th:value="${mesWinModelCraft.percentage}">
+        </div>
+    </div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="x-red">*</span>排序：</label>
+        <div class="layui-input-block">
+            <input type="text" name="sort"  autocomplete="off" lay-verify="required|number"  class="layui-input" th:value="${mesWinModelCraft.sort}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="add">立即提交</button>
+        </div>
+    </div>
+
+    <script>
+        layui.use(['form', 'layedit', 'laydate'], function(){
+            var form = layui.form
+                ,layer = layui.layer
+                ,laydate = layui.laydate;
+            form.verify({
+                name :function (value) {
+                    if(value.trim() == ""){
+                        return '请选择工序名称.';
+                    }
+                    var msg;
+                    $.ajax({
+                        url : '/mesWinModelCraft/findName',
+                        type : 'POST',
+                        data : {
+                            "name" : value,
+                            "id" : $("#id").val(),
+                            "winModelId" : $("#winModelId").val(),
+                            "parentId" : $("#parentId").val()
+                        },
+                        async : false,
+                        success:function(res){
+                            if (res.status) {
+                                msg='工序名称重复';
+                            }
+                        },
+                        error : function(e) {
+                            msg='工序名称验证失败';
+
+                        }
+                    })
+                    return msg;
+                },
+                number:[/^[1-9]\d*|0$/,'请输入正确的正整数.'],
+                percentage:[/^100$|^(\d|[1-9]\d)$/,'请输入正确的百分比.']
+            })
+            //监听提交
+            form.on('submit(add)', function(data){
+                layer.confirm('确认提交吗', function(){
+                    $.ajax({
+                        url:'/mesWinModelCraft/update',
+                        async:false,
+                        dataType: "json",
+                        data: $('#form').serialize(),
+                        success:function(res){
+                            if (res.status) {
+                                layer.msg(res.msg, {icon: 1, time: 2000});
+                                setTimeout(function (){
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                }, 2000);
+                            }else{
+                                layer.msg(res.msg, {icon: 7, time: 2000});
+                                setTimeout(function (){
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                }, 2000);
+                            }
+                        }
+                    })
+                });
+            });
+        })
+    </script>
+</form>
+</body>
+
+</html>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jh.dao.MesProjectDetailLogMapper">
+  <resultMap id="BaseResultMap" type="com.jh.entity.MesProjectDetailLog">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="WIN_NO" jdbcType="VARCHAR" property="winNo" />
+    <result column="WIN_TYPE_ID" jdbcType="VARCHAR" property="winTypeId" />
+    <result column="NUM" jdbcType="VARCHAR" property="num" />
+    <result column="BLUEPRINT_WIDTH" jdbcType="VARCHAR" property="blueprintWidth" />
+    <result column="DRAWING_HEIGHT" jdbcType="VARCHAR" property="drawingHeight" />
+    <result column="WIN_WIDTH" jdbcType="VARCHAR" property="winWidth" />
+    <result column="WIN_HEIGHT" jdbcType="VARCHAR" property="winHeight" />
+    <result column="PRE_TOTAL" jdbcType="VARCHAR" property="preTotal" />
+    <result column="PRICE" jdbcType="VARCHAR" property="price" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+    <result column="PROJECT_ID" jdbcType="VARCHAR" property="projectId" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="PARTY_WIN_NO" jdbcType="VARCHAR" property="partyWinNo" />
+  </resultMap>
+  <insert id="insert" parameterType="com.jh.entity.MesProjectDetailLog">
+    insert into MES_PROJECT_DETAIL_LOG (ID, WIN_NO, WIN_TYPE_ID, 
+      NUM, BLUEPRINT_WIDTH, DRAWING_HEIGHT, 
+      WIN_WIDTH, WIN_HEIGHT, PRE_TOTAL, 
+      PRICE, CREATE_DATE, PROJECT_ID, 
+      STATUS, CREATE_BY,PARTY_WIN_NO)
+    values (#{id,jdbcType=VARCHAR}, #{winNo,jdbcType=VARCHAR}, #{winTypeId,jdbcType=VARCHAR}, 
+      #{num,jdbcType=VARCHAR}, #{blueprintWidth,jdbcType=VARCHAR}, #{drawingHeight,jdbcType=VARCHAR}, 
+      #{winWidth,jdbcType=VARCHAR}, #{winHeight,jdbcType=VARCHAR}, #{preTotal,jdbcType=VARCHAR}, 
+      #{price,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{partyWinNo,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jh.entity.MesProjectDetailLog">
+    insert into MES_PROJECT_DETAIL_LOG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="winNo != null">
+        WIN_NO,
+      </if>
+      <if test="winTypeId != null">
+        WIN_TYPE_ID,
+      </if>
+      <if test="num != null">
+        NUM,
+      </if>
+      <if test="blueprintWidth != null">
+        BLUEPRINT_WIDTH,
+      </if>
+      <if test="drawingHeight != null">
+        DRAWING_HEIGHT,
+      </if>
+      <if test="winWidth != null">
+        WIN_WIDTH,
+      </if>
+      <if test="winHeight != null">
+        WIN_HEIGHT,
+      </if>
+      <if test="preTotal != null">
+        PRE_TOTAL,
+      </if>
+      <if test="price != null">
+        PRICE,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+      <if test="projectId != null">
+        PROJECT_ID,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="createBy != null">
+        CREATE_BY,
+      </if>
+      <if test="partyWinNo != null">
+        PARTY_WIN_NO,
+      </if>
+
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="winNo != null">
+        #{winNo,jdbcType=VARCHAR},
+      </if>
+      <if test="winTypeId != null">
+        #{winTypeId,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null">
+        #{num,jdbcType=VARCHAR},
+      </if>
+      <if test="blueprintWidth != null">
+        #{blueprintWidth,jdbcType=VARCHAR},
+      </if>
+      <if test="drawingHeight != null">
+        #{drawingHeight,jdbcType=VARCHAR},
+      </if>
+      <if test="winWidth != null">
+        #{winWidth,jdbcType=VARCHAR},
+      </if>
+      <if test="winHeight != null">
+        #{winHeight,jdbcType=VARCHAR},
+      </if>
+      <if test="preTotal != null">
+        #{preTotal,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null">
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="partyWinNo != null">
+        #{partyWinNo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+
+
+
+  <select id="list" resultType="com.jh.entity.MesProjectDetailLog">
+      select
+          *
+       from
+        MES_PROJECT_DETAIL_LOG
+      where
+         PROJECT_ID=#{projectId}
+      order by WIN_NO desc, to_char(CREATE_DATE) desc
+  </select>
+
+
+</mapper>
